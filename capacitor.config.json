@@ -1,0 +1,19 @@
+{
+  "appId": "com.hamrah.finance",
+  "appName": "مدیریت مالی امید",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "StatusBar": {
+      "overlaysWebView": false,
+      "style": "LIGHT",
+      "backgroundColor": "#edf4fa"
+    },
+    "SystemBars": {
+      "insetsHandling": "css",
+      "initialViewportFitValueHint": "cover",
+      "style": "LIGHT",
+      "hidden": false
+    }
+  }
+}
