@@ -1,6 +1,6 @@
 {
   "appId": "com.hamrah.finance",
-  "appName": "مدیریت مالی امید",
+  "appName": "مدیریت مالی حقوق",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "plugins": {

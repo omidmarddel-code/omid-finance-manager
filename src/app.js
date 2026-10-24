@@ -849,14 +849,14 @@ function openJalaliCalendar(wrapper) {
 }
 function pageHeading(title, sub) {
   const displayedTitle = title === "نمای کلی" ? "داشبورد" : title;
-  return `<div class="page-heading"><div>${sub ? `<p class="eyebrow">${sub}</p>` : ""}<h1>${displayedTitle}</h1></div><span class="today-chip">${new Intl.DateTimeFormat(locale(), { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</span></div>`;
+  return `<div class="page-heading"><div>${sub ? `<p class="eyebrow">${sub}</p>` : ""}<h1>${displayedTitle}</h1></div>${title === "نمای کلی" ? `<span class="today-chip">${new Intl.DateTimeFormat(locale(), { weekday: "long", day: "numeric", month: "long" }).format(new Date())}</span>` : ""}</div>`;
 }
 
 function authScreen() {
   const setup = !setting("pinHash");
   root.innerHTML = `<main class="auth-shell">
     <section class="auth-card">
-      <div class="auth-brand"><b>مدیریت مالی امید</b></div>
+      <div class="auth-brand"><b>مدیریت مالی حقوق</b></div>
       ${setup ? "" : '<p class="eyebrow">خوش برگشتی</p>'}
       <h1>${setup ? "رمز خود را وارد کنید" : "ورود به حساب"}</h1>
       ${setup ? "" : '<p class="auth-copy">برای دیدن فضای مالی خود، PIN را وارد کن.</p>'}
@@ -968,7 +968,7 @@ function savingsSummary() {
       ),
     )[0];
   const currentRemaining = monthData(monthNow()).remaining;
-  return `<section class="section-block savings-summary"><div><p class="eyebrow">پس‌انداز</p><h2>پس‌انداز</h2><small class="muted-copy">${latest ? `آخرین انتقال: ${monthName(legacyPeriodToJalali(latest.period))}` : "هنوز انتقالی به پس‌انداز ثبت نشده است."}</small>${currentRemaining > 0 ? `<button class="outline-button" data-action="savings-transfer" style="margin-top:8px;">انتقال مازاد این ماه (${money(currentRemaining)}) به پس‌انداز</button>` : ""}</div><strong class="${total < 0 ? "negative-text" : "positive-text"} savings-total">${money(total)}</strong></section>`;
+  return `<section class="section-block savings-summary"><div><p class="eyebrow">پس‌انداز</p><h2>پس‌انداز</h2><small class="muted-copy">${latest ? `آخرین انتقال: ${monthName(legacyPeriodToJalali(latest.period))}` : "هنوز انتقالی به پس‌انداز ثبت نشده است."}</small>${currentRemaining > 0 ? `<button class="outline-button" data-action="savings-transfer" style="margin-top:8px;">انتقال مازاد (${money(currentRemaining)})</button>` : ""}</div><strong class="${total < 0 ? "negative-text" : "positive-text"} savings-total">${money(total)}</strong></section>`;
 }
 function installmentDueInfo(item, offset) {
   const at = dueDateForOffset(item, offset || 0);
@@ -1139,13 +1139,12 @@ function reports() {
     )
     .join(
       "",
-    )}</section><section class="charts-grid"><article class="chart-panel"><p class="eyebrow">مقایسهٔ جریان پول</p><h2>درآمد، هزینه و قسط</h2><div class="chart-block">${chart}</div><div class="flow-table-wrap">${flowTable}</div></article><article class="chart-panel"><p class="eyebrow">ترکیب هزینه‌ها</p><h2>دسته‌بندی هزینه</h2>${
+    )}</section><section class="report-details"><article class="detail-card"><h2>جریان پول ماهانه</h2>${flowTable}</article><article class="detail-card"><h2>دسته‌بندی هزینه‌ها</h2>${
     Object.entries(byCategory)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
       .map(
-        ([name, value], index) =>
-          `<div class="category-bar"><span>${escape(displayCategory(name))}</span><div><i style="width:${(value / Math.max(1, data.expense)) * 100}%;--bar-color:${["#c5f36b", "#8ed3c2", "#f3bd62", "#ff806a", "#8bb5ee", "#c7a1dc"][index]}"></i></div><b>${money(value)}</b></div>`,
+        ([name, value]) =>
+          `<div class="detail-row"><span>${escape(displayCategory(name))}</span><b>${money(value)}</b><small>${number.format(data.expense ? Math.round(value / data.expense * 100) : 0)}٪</small></div>`,
       )
       .join("") || '<p class="muted-copy">داده‌ای برای نمایش نیست.</p>'
   }</article></section>${state.reportType === "month" ? `<section class="comparison-panel"><div><p class="eyebrow">مقایسه با ماه قبل</p><h2>هزینه‌ها ${data.expense > prev.expense ? `${number.format(Math.round(((data.expense - prev.expense) / Math.max(1, prev.expense)) * 100))}٪ بیشتر` : "کمتر یا برابر"}</h2></div><div>${monthName(addMonth(reportMonth, -1))} <b>${money(prev.expense)}</b><br>${monthName(reportMonth)} <b>${money(data.expense)}</b></div></section>` : ""}`;
@@ -1292,7 +1291,7 @@ function render() {
       `${savingsSummary()}<section class="home-lower">`,
     );
   }
-  root.innerHTML = `<div class="app-shell"><header class="topbar"><a class="brand-link" data-page="home"><b>مدیریت مالی امید</b></a></header><main class="content-area">${body}</main><nav class="bottom-nav">${tabs.map(([key, label, glyph]) => `<button class="nav-item ${state.page === key ? "active" : ""}" data-page="${key}"><span>${glyph}</span>${label}</button>`).join("")}</nav><div id="modalRoot"></div><div id="toast" role="status"></div></div>`;
+  root.innerHTML = `<div class="app-shell"><header class="topbar"><a class="brand-link" data-page="home"><b>مدیریت مالی حقوق</b></a></header><main class="content-area">${body}</main><nav class="bottom-nav">${tabs.map(([key, label, glyph]) => `<button class="nav-item ${state.page === key ? "active" : ""}" data-page="${key}"><span>${glyph}</span>${label}</button>`).join("")}</nav><div id="modalRoot"></div><div id="toast" role="status"></div></div>`;
   const settingsSide = document.querySelector(".settings-side");
   if (settingsSide) {
     settingsSide.insertAdjacentHTML("afterbegin", themePanel());
@@ -1393,7 +1392,7 @@ function backupFileName() {
   return `hamrah-backup-${formatJalaliDate(dateNow()).replaceAll("/", "-")}.json`;
 }
 async function backup() {
-  const payload = { app: "hamrah-finance", version: 1 };
+  const payload = { app: "hamrah-finance", version: 2 };
   for (const table of [
     "transactions",
     "installments",
@@ -1437,7 +1436,7 @@ async function backup() {
     }
     try {
       await Share.share({
-        title: "نسخهٔ پشتیبان مدیریت مالی امید",
+        title: "نسخهٔ پشتیبان مدیریت مالی حقوق",
         text: "فایل پشتیبان برنامه",
         files: [savedPath],
         dialogTitle: "ذخیرهٔ فایل پشتیبان",
@@ -1516,7 +1515,7 @@ async function restorePick() {
   }
 }
 async function quickBackup() {
-  const payload = { app: "hamrah-finance", version: 1 };
+  const payload = { app: "hamrah-finance", version: 2 };
   for (const table of [
     "transactions",
     "installments",
@@ -1579,7 +1578,7 @@ async function saveQuickBackup() {
 let autoBackupTimer = null;
 async function autoBackup() {
   if (!Capacitor.isNativePlatform()) return;
-  const payload = { app: "hamrah-finance", version: 1 };
+  const payload = { app: "hamrah-finance", version: 2 };
   for (const table of [
     "transactions",
     "installments",
@@ -1969,7 +1968,7 @@ function handleAndroidBack() {
 async function biometric() {
   try {
     await NativeBiometric.verifyIdentity({
-      reason: t("ورود به مدیریت مالی امید"),
+      reason: t("ورود به مدیریت مالی حقوق"),
       title: t("تأیید هویت"),
       description: t("اطلاعات بیومتریک ذخیره نمی‌شود"),
     });

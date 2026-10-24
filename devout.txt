@@ -1,0 +1,263 @@
+
+> hamrah-finance@1.0.0 dev
+> vite --host 0.0.0.0
+
+[2m9:12:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Re-optimizing dependencies because vite config has changed
+
+  [32m[1mVITE[22m v6.4.3[39m  [2mready in [0m[1m485[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://100.127.255.253:[1m5173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://172.20.112.1:[1m5173[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.10.44:[1m5173[22m/[39m
+[2m9:22:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:22:50 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:36:37 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:40:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:40:32 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:40:36 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:40:42 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:40:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:42:31 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:42:31 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:849:5
+[33m  847|          catch (error) { await remove('transactions', transaction.id); throw error; }
+  848|        }
+  849|      }
+     |      ^
+  850|      await refresh(); render(); toast('تراکنش ثبت شد.');
+  851|    }[39m
+[2m9:42:31 AM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:849:5
+[33m  847|          catch (error) { await remove('transactions', transaction.id); throw error; }
+  848|        }
+  849|      }
+     |      ^
+  850|      await refresh(); render(); toast('تراکنش ثبت شد.');
+  851|    }[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m9:43:17 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:48:09 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:48:11 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33m@solimanware/capacitor-sms-reader[32m[39m
+[2m9:48:11 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+[2m9:49:42 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:49:48 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:49:54 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:50:00 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:50:06 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:50:11 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:50:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:50:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:50:30 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:50:38 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:55:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:57:42 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:58:40 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:58:47 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m9:58:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m9:58:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m9:59:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:59:11 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:59:13 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m9:59:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m9:59:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m9:59:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m10:02:34 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:03:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:03:28 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:03:33 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:04:03 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:10:55 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:11:01 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:14:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:14:10 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:15:20 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:15:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:19:16 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:19:27 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:22:50 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mmobile-preview.html[22m
+[2m10:28:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:30:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:30:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:30:31 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:31:33 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:31:45 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:31:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:32:28 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:32:36 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:32:43 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:32:49 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:32:55 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:34:50 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:34:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m10:36:46 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:36:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m10:38:57 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m10:41:16 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m11:18:09 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m11:18:15 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m11:18:44 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m11:25:08 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m11:25:19 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m11:45:27 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m11:49:59 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m11:55:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:03:43 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:03:49 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:04:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:07:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:07:33 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:07:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:07:44 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:07:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:07:58 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:03 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:13 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:20 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:26 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:32 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:43 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:08:56 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:09:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:09:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:16:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:16:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:17:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:17:08 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:604:522
+[33m  602|  function themePanel() {
+  603|    const selectedTheme = setting('theme', 'light');
+  604|    return `<section class="settings-section theme-section"><p class="eyebrow">زبان برنامه</p><label class="language-label">زبان<select id="languageSetting"><option value="fa" ${getLanguage() === 'fa' ? 'selected' : ''}>فارسی</option><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>English</option></select></label><p class="eyebrow font-size-label">ظاهر برنامه</p><h2>پوسته</h2><div class="segmented-control theme-control" role="group" aria-label="انتخاب تم"><button type="button" data-theme-choice="light" class="${selectedTheme === 'light' ? 'selected' : ''}">روشن</button><button type="button" data-theme-choice="dark" class="${selectedTheme === 'dark' ? 'selected' : ''}">تاریک</button></div><p class="eyebrow font-size-label">اندازهٔ نوشته</p><div class="segmented-control font-control" role="group" aria-label="اندازهٔ فونت">${[['small', 'کوچک'], ['normal', 'معمولی'], ['large', 'بزرگ'], ['xlarge', 'خیلی بزرگ']].map(([value, label]) => `<button type="button" data-font-choice="${value}" class="${fontSizeKey() === value ? 'selected' : ''}">${label}</button>`).join('')}</div></section>`;
+     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ^
+  605|  }
+  606|  function installmentReminderPanel() {[39m
+[2m12:17:08 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:604:522
+[33m  602|  function themePanel() {
+  603|    const selectedTheme = setting('theme', 'light');
+  604|    return `<section class="settings-section theme-section"><p class="eyebrow">زبان برنامه</p><label class="language-label">زبان<select id="languageSetting"><option value="fa" ${getLanguage() === 'fa' ? 'selected' : ''}>فارسی</option><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>English</option></select></label><p class="eyebrow font-size-label">ظاهر برنامه</p><h2>پوسته</h2><div class="segmented-control theme-control" role="group" aria-label="انتخاب تم"><button type="button" data-theme-choice="light" class="${selectedTheme === 'light' ? 'selected' : ''}">روشن</button><button type="button" data-theme-choice="dark" class="${selectedTheme === 'dark' ? 'selected' : ''}">تاریک</button></div><p class="eyebrow font-size-label">اندازهٔ نوشته</p><div class="segmented-control font-control" role="group" aria-label="اندازهٔ فونت">${[['small', 'کوچک'], ['normal', 'معمولی'], ['large', 'بزرگ'], ['xlarge', 'خیلی بزرگ']].map(([value, label]) => `<button type="button" data-font-choice="${value}" class="${fontSizeKey() === value ? 'selected' : ''}">${label}</button>`).join('')}</div></section>`;
+     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ^
+  605|  }
+  606|  function installmentReminderPanel() {[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m12:17:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:17:42 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:663:581
+[33m  661|  function themePanel() {
+  662|    const selectedTheme = setting('theme', 'light');
+  663|    return `<section class="settings-section theme-section"><p class="eyebrow">زبان برنامه</p><label class="language-label">زبان<select id="languageSetting"><option value="fa" ${getLanguage() === 'fa' ? 'selected' : ''}>فارسی</option><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>English</option></select></label><p class="eyebrow font-size-label">ظاهر برنامه</p><h2>پوسته</h2><div class="segmented-control theme-control" role="group" aria-label="انتخاب تم"><button type="button" data-theme-choice="light" class="${selectedTheme === 'light' ? 'selected' : ''}">روشن</button><button type="button" data-theme-choice="dark" class="${selectedTheme === 'dark' ? 'selected' : ''}">تاریک</button></div><p class="eyebrow font-size-label">اندازهٔ نوشته</p><div class="segmented-control font-control" role="group" aria-label="اندازهٔ فونت">${[['small', 'کوچک'], ['normal', 'معمولی'], ['large', 'بزرگ'], ['xlarge', 'خیلی بزرگ']].map(([value, label]) => `<button type="button" data-font-choice="${value}" class="${fontSizeKey() === value ? 'selected' : ''}">${label}</button>`).join('')}</div></section>`;
+     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ^
+  664|  }
+  665|  function installmentReminderPanel() {[39m
+[2m12:17:42 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:663:581
+[33m  661|  function themePanel() {
+  662|    const selectedTheme = setting('theme', 'light');
+  663|    return `<section class="settings-section theme-section"><p class="eyebrow">زبان برنامه</p><label class="language-label">زبان<select id="languageSetting"><option value="fa" ${getLanguage() === 'fa' ? 'selected' : ''}>فارسی</option><option value="en" ${getLanguage() === 'en' ? 'selected' : ''}>English</option></select></label><p class="eyebrow font-size-label">ظاهر برنامه</p><h2>پوسته</h2><div class="segmented-control theme-control" role="group" aria-label="انتخاب تم"><button type="button" data-theme-choice="light" class="${selectedTheme === 'light' ? 'selected' : ''}">روشن</button><button type="button" data-theme-choice="dark" class="${selectedTheme === 'dark' ? 'selected' : ''}">تاریک</button></div><p class="eyebrow font-size-label">اندازهٔ نوشته</p><div class="segmented-control font-control" role="group" aria-label="اندازهٔ فونت">${[['small', 'کوچک'], ['normal', 'معمولی'], ['large', 'بزرگ'], ['xlarge', 'خیلی بزرگ']].map(([value, label]) => `<button type="button" data-font-choice="${value}" class="${fontSizeKey() === value ? 'selected' : ''}">${label}</button>`).join('')}</div></section>`;
+     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ^
+  664|  }
+  665|  function installmentReminderPanel() {[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m12:18:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:18:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:18:46 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:20:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:30:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m12:30:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m12:30:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m12:30:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m1:02:31 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:03:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:03:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:03:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:03:42 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:06:04 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:06:11 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:06:28 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:06:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:06:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:06:39 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:07:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m1:14:23 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m1:15:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:19:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:20:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:20:32 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:20:38 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m1:27:58 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:29:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m1:29:51 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:31:27 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m1:35:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m1:35:55 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:244:32
+[33m  242|    state.monthPromptShown = false;
+  243|  }
+  244|  async function checkMonthCycle() {
+     |                                 ^
+  245|    if (monthNow() === state.monthCycle) return;
+  246|    await prepareCurrentMonth();[39m
+[2m1:35:55 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:244:32
+[33m  242|    state.monthPromptShown = false;
+  243|  }
+  244|  async function checkMonthCycle() {
+     |                                 ^
+  245|    if (monthNow() === state.monthCycle) return;
+  246|    await prepareCurrentMonth();[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+node:internal/fs/watchers:321
+    const error = new UVException({
+                  ^
+
+Error: EBUSY: resource busy or locked, watch 'C:\Users\PRO\Desktop\manger\src\app.js.bak'
+    at FSWatcher.<computed> (node:internal/fs/watchers:321:19)
+    at Object.watch (node:fs:2548:36)
+    at createFsWatchInstance (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:22195:17)
+    at setFsWatchListener (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:22242:15)
+    at NodeFsHandler._watchWithNodeFs (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:22397:14)
+    at NodeFsHandler._handleFile (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:22461:23)
+    at NodeFsHandler._addToNodeFs (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:22703:21)
+Emitted 'error' event on FSWatcher instance at:
+    at FSWatcher._handleError (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:23896:10)
+    at NodeFsHandler._addToNodeFs (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:22711:18) {
+  errno: -4082,
+  syscall: 'watch',
+  code: 'EBUSY',
+  path: 'C:\\Users\\PRO\\Desktop\\manger\\src\\app.js.bak',
+  filename: 'C:\\Users\\PRO\\Desktop\\manger\\src\\app.js.bak'
+}
+
+Node.js v24.18.0
+
+C:\Users\PRO\Desktop\manger>
