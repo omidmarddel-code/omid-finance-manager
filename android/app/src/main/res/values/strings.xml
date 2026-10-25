@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">مدیریت مالی امید</string>
-    <string name="title_activity_main">مدیریت مالی امید</string>
+    <string name="app_name">مدیریت مالی حقوق</string>
+    <string name="title_activity_main">مدیریت مالی حقوق</string>
     <string name="package_name">com.hamrah.finance</string>
     <string name="custom_url_scheme">com.hamrah.finance</string>
 </resources>

@@ -1,5 +1,5 @@
 const translations = {
-  "مدیریت مالی امید": "Omid Finance",
+  "مدیریت مالی حقوق": "مدیریت مالی حقوق",
   "انتخاب تم": "Choose theme",
   "اندازهٔ فونت": "Text size",
   خانه: "Home",
@@ -300,7 +300,7 @@ const translations = {
     "Installment saved, but its reminder could not be scheduled.",
   "در پوشهٔ عمومی ذخیره نشد؛ داخل خود برنامه ذخیره شد.":
     "Could not save to the public folder. Saved inside the app instead.",
-  "نسخهٔ پشتیبان مدیریت مالی امید": "Omid Finance backup",
+  "نسخهٔ پشتیبان مدیریت مالی حقوق": "Omid Salary Finance backup",
   "فایل پشتیبان برنامه": "App backup file",
   "ذخیرهٔ فایل پشتیبان": "Save backup file",
   "فایل پشتیبان ذخیره شد.": "Backup file saved.",
@@ -317,7 +317,6 @@ const translations = {
   "سررسید قسط بعدی معتبر نیست؛ مثل ۱۴۰۵/۱۰/۲ وارد کن.":
     "Invalid installment due date. Try 1405/10/2.",
   "می‌خواهید از برنامه خارج شوید؟": "Do you want to exit the app?",
-  "ورود به مدیریت مالی امید": "Sign in to Omid Finance",
   "تأیید هویت": "Identity verification",
   "اطلاعات بیومتریک ذخیره نمی‌شود": "Biometric data is not stored.",
   "تاریخ معتبر نیست؛ مثل ۱۴۰۵/۰۷/۰۹ وارد کن.":
@@ -572,8 +571,7 @@ export function setLanguage(language) {
   currentLanguage = language === "en" ? "en" : "fa";
   document.documentElement.lang = currentLanguage;
   document.documentElement.dir = currentLanguage === "en" ? "ltr" : "rtl";
-  document.title =
-    currentLanguage === "en" ? "Omid Finance" : "مدیریت مالی امید";
+  document.title = "مدیریت مالی حقوق";
 }
 
 export function getLanguage() {
