@@ -1180,30 +1180,43 @@ function settings() {
     return `${heading("ظاهر برنامه")}${themePanel()}`;
   }
   if (pane === "contact") {
-    return `${heading("ارتباط با ما")}<section class="settings-section contact-card">
-      <div class="contact-hero">
-        <img class="contact-avatar" src="/omid-marddel.jpg" alt="امید مرددل" />
-        <div>
+    return `${heading("ارتباط با ما")}<section class="settings-section contact-card luxury-contact">
+      <div class="contact-hero luxury-hero">
+        <div class="contact-avatar-wrap">
+          <img class="contact-avatar" src="/omid-marddel.jpg" alt="امید مرددل" />
+        </div>
+        <div class="contact-hero-text">
           <p class="eyebrow">سلام! 👋</p>
-          <h2>من امید مرددل هستم</h2>
-          <p class="muted-copy">من این برنامه رو با عشق ساختم؛ اگه نظر، پیشنهاد یا مشکلی داری، خوشحال می‌شم بشنوم.</p>
+          <h2>امید مرددل</h2>
+          <p class="muted-copy">برای پیشنهاد، انتقاد یا گزارش مشکل، از راه‌های ارتباطی زیر با من در تماس باش.</p>
         </div>
       </div>
-      <div class="contact-links">
-        <button class="contact-link" data-action="open-link" data-url="tel:09197392944">
-          <span class="contact-link-icon">📞</span>
-          <span><b>زنگ بزن</b><small>۰۹۱۹۷۳۹۲۹۴۴</small></span>
+      <div class="contact-links luxury-links">
+        <div class="contact-link luxury-link contact-phone">
+          <span class="contact-link-icon luxury-icon">📞</span>
+          <span class="luxury-link-text">
+            <b>تماس تلفنی</b>
+            <span class="contact-phone-number">۰۹۱۹۷۳۹۲۹۴۴</span>
+          </span>
+        </div>
+        <button class="contact-link luxury-link" data-action="open-link" data-url="https://t.me/+989197392944">
+          <span class="contact-link-icon luxury-icon">✈️</span>
+          <span class="luxury-link-text">
+            <b>تلگرام</b>
+            <small>پیام و پیشنهاد</small>
+          </span>
+          <span class="luxury-arrow">›</span>
         </button>
-        <button class="contact-link" data-action="open-link" data-url="https://t.me/+989197392944">
-          <span class="contact-link-icon">💬</span>
-          <span><b>تلگرام</b><small>پیام بده، سریع جواب می‌دم</small></span>
-        </button>
-        <button class="contact-link" data-action="open-link" data-url="https://wa.me/989197392944">
-          <span class="contact-link-icon">📱</span>
-          <span><b>واتس‌اپ</b><small>پشتیبانی سریع و دوستانه</small></span>
+        <button class="contact-link luxury-link" data-action="open-link" data-url="https://wa.me/989197392944">
+          <span class="contact-link-icon luxury-icon">💬</span>
+          <span class="luxury-link-text">
+            <b>واتساپ</b>
+            <small>ارتباط مستقیم</small>
+          </span>
+          <span class="luxury-arrow">›</span>
         </button>
       </div>
-      <p class="muted-copy contact-note">هر وقت دلت خواست، یه پیام بده؛ با هم بهترش می‌کنیم. 😊</p>
+      <p class="contact-signature">با احترام، امید مرددل</p>
     </section>`;
   }
   if (pane === "reset") {

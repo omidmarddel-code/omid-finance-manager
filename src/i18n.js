@@ -47,7 +47,20 @@ const translations = {
   'چک ثبت شد؛ مبلغ آن در محاسبات مالی وارد نمی‌شود.': 'Check saved. Its amount is excluded from financial calculations.', 'چک ثبت شد؛ برای اعلان سررسید، مجوز اعلان را فعال کن.': 'Check saved. Enable notifications to receive due date reminders.', 'چک ثبت شد؛ زمان‌بندی اعلان انجام نشد.': 'Check saved, but reminders could not be scheduled.',
   'چک حذف شود؟': 'Delete this check?', 'چک حذف شد.': 'Check deleted.', 'چک ثبت نشده': 'No checks recorded', 'چک‌ها را ثبت کن تا پیش از سررسید یادآوری دریافت کنی.': 'Add checks to receive reminders before their due dates.', 'ویرایش': 'Edit', 'ذخیره تغییرات': 'Save changes', 'چک ثبت شد': 'Check saved',
   'عنوان یا شماره چک را وارد کن.': 'Enter a check name or number.', 'تاریخ سررسید چک معتبر نیست؛ سال/ماه/روز را بررسی کن.': 'Invalid check due date. Check the year, month, and day.', 'مبلغ چک باید عدد صحیحِ مثبت و به تومان باشد.': 'The check amount must be a positive whole number in Toman.',
-  'یادآوری پرداخت چک': 'Check payment reminder'
+  'یادآوری پرداخت چک': 'Check payment reminder',
+  'ارتباط با ما': 'Contact Us',
+  'تماس با ما': 'Contact Us', 'سلام! 👋': 'Hello! 👋', 'امید مرددل': 'Omid Marddel',
+  'برای پیشنهاد، انتقاد یا گزارش مشکل، از راه‌های ارتباطی زیر با من در تماس باش.': 'For suggestions, feedback, or to report an issue, reach me through the channels below.',
+  'تماس تلفنی': 'Phone call', 'پیام و پیشنهاد': 'Message & suggestion', 'ارتباط مستقیم': 'Direct contact',
+  'با احترام، امید مرددل': 'Best regards, Omid Marddel',
+  'تلگرام': 'Telegram', 'واتساپ': 'WhatsApp',
+  'درآمد و بودجه': 'Income and budget', 'حقوق، سقف هزینه، هدف پس‌انداز': 'Salary, expense limit, savings goal',
+  'امنیت دستگاه': 'Device security', 'قفل، بیومتریک، PIN': 'Lock, biometrics, PIN',
+  'پشتیبان‌گیری': 'Backup', 'ذخیره و بازگردانی اطلاعات': 'Save and restore data',
+  'دسته‌بندی‌ها': 'Categories', 'مدیریت دسته‌های هزینه': 'Manage expense categories',
+  'ظاهر و اندازهٔ نوشته': 'Appearance and text size', 'تم، زبان، اندازهٔ فونت': 'Theme, language, font size',
+  'امید مرددل · 09197392944': 'Omid Marddel · 09197392944',
+  'بازنشانی': 'Reset', 'پاک‌کردن اطلاعات برنامه': 'Clear app data'
 };
 
 let currentLanguage = 'fa';

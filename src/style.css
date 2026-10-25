@@ -512,3 +512,24 @@ html[data-theme="dark"] .donut-center-label,html[data-theme="dark"] .donut-legen
 @media(max-width:720px){.chart-block{padding:14px 12px}.donut-wrap{grid-template-columns:1fr;justify-items:center;gap:14px}.donut{width:160px;height:160px}.donut-legend{width:100%}.donut-legend-row,.donut-legend-row b{font-size:11px}}
 
 
+/* ===== Luxury contact ===== */
+.luxury-contact{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--surface),var(--raised));border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.06)}
+.luxury-hero{display:flex;align-items:center;gap:16px;padding:6px 2px}
+.contact-avatar-wrap{position:relative;flex:0 0 auto}
+.contact-avatar-wrap::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:conic-gradient(from 180deg,var(--mint),transparent 60%,var(--sky));z-index:-1;filter:blur(2px);opacity:.7}
+.luxury-hero .contact-avatar{width:84px;height:84px;border-radius:50%;object-fit:cover;border:2px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.contact-hero-text{display:grid;gap:4px}
+.contact-hero-text h2{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}
+.contact-hero-text .muted-copy{margin:0;max-width:34ch}
+.luxury-links{display:grid;gap:10px}
+.luxury-link{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));color:var(--text);cursor:pointer;text-align:right;transition:transform .18s ease,border-color .18s ease,background .18s ease;min-height:60px}
+.luxury-link:hover{transform:translateY(-2px);border-color:var(--mint);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
+.luxury-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.06);font-size:20px;flex:0 0 auto}
+.luxury-link-text{display:grid;gap:2px}
+.luxury-link-text b{font-size:13px;font-weight:600}
+.luxury-link-text small{color:var(--muted);font-size:10px}
+.luxury-arrow{color:var(--muted);font-size:20px;opacity:.7}
+.contact-phone .luxury-link-text span{color:var(--soft);font-size:12px;letter-spacing:.5px}
+.contact-phone-number{user-select:all;-webkit-user-select:all;cursor:text;font-weight:700;color:var(--mint)}
+.contact-signature{margin:4px 0 0;text-align:center;color:var(--muted);font-size:11px;letter-spacing:.3px}
+
