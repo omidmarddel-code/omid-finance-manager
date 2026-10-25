@@ -925,7 +925,7 @@ function expenses() {
 }
 function themePanel() {
   const selectedTheme = setting("theme", "light");
-  return `<section class="settings-section theme-section"><p class="eyebrow">زبان برنامه</p><label class="language-label">زبان<select id="languageSetting"><option value="fa" ${getLanguage() === "fa" ? "selected" : ""}>فارسی</option><option value="en" ${getLanguage() === "en" ? "selected" : ""}>English</option></select></label><p class="eyebrow font-size-label">ظاهر برنامه</p><h2>پوسته</h2><div class="segmented-control theme-control" role="group" aria-label="انتخاب تم"><button type="button" data-theme-choice="light" class="${selectedTheme === "light" ? "selected" : ""}">روشن</button><button type="button" data-theme-choice="dark" class="${selectedTheme === "dark" ? "selected" : ""}">تاریک</button></div><p class="eyebrow font-size-label">اندازهٔ نوشته</p><div class="segmented-control font-control" role="group" aria-label="اندازهٔ فونت">${[
+  return `<section class="settings-section theme-section"><p class="eyebrow">زبان برنامه</p><div class="segmented-control language-control" role="group" aria-label="انتخاب زبان"><button type="button" data-language-choice="fa" class="${getLanguage() === "fa" ? "selected" : ""}">فارسی</button><button type="button" data-language-choice="en" class="${getLanguage() === "en" ? "selected" : ""}">English</button></div><p class="eyebrow font-size-label">ظاهر برنامه</p><h2>پوسته</h2><div class="segmented-control theme-control" role="group" aria-label="انتخاب تم"><button type="button" data-theme-choice="light" class="${selectedTheme === "light" ? "selected" : ""}">روشن</button><button type="button" data-theme-choice="dark" class="${selectedTheme === "dark" ? "selected" : ""}">تاریک</button></div><p class="eyebrow font-size-label">اندازهٔ نوشته</p><div class="segmented-control font-control" role="group" aria-label="اندازهٔ فونت">${[
     ["small", "کوچک"],
     ["normal", "معمولی"],
     ["large", "بزرگ"],
@@ -2172,6 +2172,32 @@ root.addEventListener("click", async (event) => {
     render();
     return;
   }
+  const languageChoice = event.target.closest("[data-language-choice]");
+  if (languageChoice) {
+    const language = languageChoice.dataset.languageChoice;
+    if (getLanguage() !== language) {
+      await setSetting("language", language);
+      setLanguage(language);
+      if (Capacitor.isNativePlatform()) {
+        try {
+          await Promise.all([
+            scheduleInstallmentNotifications(),
+            scheduleExpenseLogReminders(),
+            scheduleCheckNotifications(),
+          ]);
+        } catch (error) {
+          console.warn("Could not refresh localized notification text.", error);
+        }
+      }
+      render();
+      toast(
+        language === "en"
+          ? "Language changed to English."
+          : "زبان به فارسی تغییر کرد.",
+      );
+    }
+    return;
+  }
   const themeChoice = event.target.closest("[data-theme-choice]");
   if (themeChoice) {
     const theme = themeChoice.dataset.themeChoice;
@@ -2420,29 +2446,6 @@ root.addEventListener("input", (event) => {
   }
 });
 root.addEventListener("change", async (event) => {
-  if (event.target.id === "languageSetting") {
-    const language = event.target.value;
-    await setSetting("language", language);
-    setLanguage(language);
-    if (Capacitor.isNativePlatform()) {
-      try {
-        await Promise.all([
-          scheduleInstallmentNotifications(),
-          scheduleExpenseLogReminders(),
-          scheduleCheckNotifications(),
-        ]);
-      } catch (error) {
-        console.warn("Could not refresh localized notification text.", error);
-      }
-    }
-    render();
-    toast(
-      language === "en"
-        ? "Language changed to English."
-        : "زبان به فارسی تغییر کرد.",
-    );
-    return;
-  }
   if (event.target.id === "categoryFilter") {
     state.filter = event.target.value;
     render();

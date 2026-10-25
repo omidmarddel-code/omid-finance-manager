@@ -466,8 +466,6 @@ html[dir="ltr"] .category-bar{direction:ltr}
 html[dir="ltr"] .comparison-panel{direction:ltr}
 html[dir="ltr"] .bottom-nav{direction:ltr}
 html[dir="ltr"] .privacy-footnote{direction:ltr}
-.language-label{display:grid;gap:7px;margin:8px 0 17px;color:var(--soft);font-size:11px}
-.language-label select{width:100%;max-width:none}
 /* Keep Android system bars visible and reserve their safe areas. */
 html,body{min-height:100%;min-height:100dvh}
 body{min-height:100dvh}
