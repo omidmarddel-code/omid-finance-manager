@@ -533,3 +533,15 @@ html[data-theme="dark"] .donut-center-label,html[data-theme="dark"] .donut-legen
 .contact-phone-number{user-select:all;-webkit-user-select:all;cursor:text;font-weight:700;color:var(--mint)}
 .contact-signature{margin:4px 0 0;text-align:center;color:var(--muted);font-size:11px;letter-spacing:.3px}
 
+
+/* ─ راهنمای برنامه (Guide) ─ */
+.guide-section ol.guide-steps{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:11px;counter-reset:none}
+.guide-steps li{padding:14px 16px;border:1px solid var(--line);border-radius:13px;background:var(--raised);display:grid;gap:6px}
+.guide-steps li>b{font-size:14px;color:var(--soft)}
+.guide-steps li>span{color:var(--muted);font-size:13px;line-height:2}
+.guide-tips{margin-top:16px;padding:14px 16px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.guide-tips>b{display:block;margin-bottom:9px;font-size:14px;color:var(--sky)}
+.guide-tips ul{margin:0;padding-inline-start:18px;display:grid;gap:6px}
+.guide-tips li{color:var(--muted);font-size:13px;line-height:2}
+html[data-theme="dark"] .guide-steps li{background:rgba(28,39,52,.7)}
+html[data-theme="dark"] .guide-tips{background:rgba(28,39,52,.6)}

@@ -1068,8 +1068,12 @@ function reports() {
     ["expense", "هزینه", "#e5484d", +data.expense || 0],
     ["loan", "قسط", "#3d7fd8", +data.paid || 0],
   ];
-  const total = chartSeries.reduce((sum, [, , value]) => sum + (+value || 0), 0);
-  const reportKey = state.reportType === "year" ? reportMonth.slice(0, 4) : reportMonth;
+  const total = chartSeries.reduce(
+    (sum, [, , value]) => sum + (+value || 0),
+    0,
+  );
+  const reportKey =
+    state.reportType === "year" ? reportMonth.slice(0, 4) : reportMonth;
   console.info("[report-chart]", {
     type: state.reportType,
     reportKey,
@@ -1116,19 +1120,17 @@ function reports() {
     ],
     ["بیشترین دسته", highest?.[0] || "—"],
   ]
-    .map(
-      ([label, value]) => {
-        const cls =
-          label === "مبلغ باقی‌مانده" && typeof value === "number"
-            ? value < 0
-              ? "negative-text"
-              : value > 0
-                ? "positive-text"
-                : ""
-            : "";
-        return `<article><small>${label}</small><strong class="${cls}">${typeof value === "number" ? money(value) : escape(value)}</strong></article>`;
-      },
-    )
+    .map(([label, value]) => {
+      const cls =
+        label === "مبلغ باقی‌مانده" && typeof value === "number"
+          ? value < 0
+            ? "negative-text"
+            : value > 0
+              ? "positive-text"
+              : ""
+          : "";
+      return `<article><small>${label}</small><strong class="${cls}">${typeof value === "number" ? money(value) : escape(value)}</strong></article>`;
+    })
     .join(
       "",
     )}</section><section class="report-details"><article class="detail-card"><h2>جریان پول ماهانه</h2>${flowTable}</article><article class="detail-card"><h2>دسته‌بندی هزینه‌ها</h2>${
@@ -1136,7 +1138,7 @@ function reports() {
       .sort((a, b) => b[1] - a[1])
       .map(
         ([name, value]) =>
-          `<div class="detail-row"><span>${escape(displayCategory(name))}</span><b>${money(value)}</b><small>${number.format(data.expense ? Math.round(value / data.expense * 100) : 0)}٪</small></div>`,
+          `<div class="detail-row"><span>${escape(displayCategory(name))}</span><b>${money(value)}</b><small>${number.format(data.expense ? Math.round((value / data.expense) * 100) : 0)}٪</small></div>`,
       )
       .join("") || '<p class="muted-copy">داده‌ای برای نمایش نیست.</p>'
   }</article></section>${state.reportType === "month" ? `<section class="comparison-panel"><div><p class="eyebrow">مقایسه با ماه قبل</p><h2>هزینه‌ها ${data.expense > prev.expense ? `${number.format(Math.round(((data.expense - prev.expense) / Math.max(1, prev.expense)) * 100))}٪ بیشتر` : "کمتر یا برابر"}</h2></div><div>${monthName(addMonth(reportMonth, -1))} <b>${money(prev.expense)}</b><br>${monthName(reportMonth)} <b>${money(data.expense)}</b></div></section>` : ""}`;
@@ -1160,6 +1162,7 @@ function settings() {
       <button class="settings-menu-item" data-action="settings-open" data-pane="backup"><span>💾</span><div><b>پشتیبان‌گیری</b><small>ذخیره و بازگردانی اطلاعات</small></div><span>›</span></button>
       <button class="settings-menu-item" data-action="settings-open" data-pane="categories"><span>🏷</span><div><b>دسته‌بندی‌ها</b><small>مدیریت دسته‌های هزینه</small></div><span>›</span></button>
       <button class="settings-menu-item" data-action="settings-open" data-pane="appearance"><span>🎨</span><div><b>ظاهر و اندازهٔ نوشته</b><small>تم، زبان، اندازهٔ فونت</small></div><span>›</span></button>
+      <button class="settings-menu-item" data-action="settings-open" data-pane="guide"><span>📖</span><div><b>راهنمای برنامه</b><small>آموزش گام‌به‌گام استفاده</small></div><span>›</span></button>
       <button class="settings-menu-item" data-action="settings-open" data-pane="contact"><span>👤</span><div><b>ارتباط با ما</b><small>امید مرددل · 09197392944</small></div><span>›</span></button>
       <button class="settings-menu-item" data-action="settings-open" data-pane="reset"><span>♻️</span><div><b>بازنشانی</b><small>پاک‌کردن اطلاعات برنامه</small></div><span>›</span></button>
     </section>`;
@@ -1178,6 +1181,36 @@ function settings() {
   }
   if (pane === "appearance") {
     return `${heading("ظاهر برنامه")}${themePanel()}`;
+  }
+  if (pane === "guide") {
+    return `${heading("راهنمای برنامه")}<section class="settings-section guide-section">
+      <p class="eyebrow">راهنمای گام‌به‌گام</p>
+      <h2>با برنامه آشنا شو</h2>
+      <p class="muted-copy">این برنامه یک دفتر مالی شخصی و کاملاً آفلاین است؛ همهٔ اطلاعات فقط روی همین دستگاه ذخیره می‌شود و هیچ داده‌ای به اینترنت یا فضای ابری ارسال نمی‌شود.</p>
+      <ol class="guide-steps">
+        <li><b>۱. ثبت حقوق و بودجه</b><span>در صفحهٔ اصلی می‌توانی <b>حقوق تخمینی</b> ماه را ثبت کنی (ویرایش یا ثبت از تنظیمات ← درآمد و بودجه). این مبلغ تا زمان ثبت حقوق واقعی در موجودی لحاظ می‌شود؛ بعد از ثبت حقوق واقعی، اختلاف آن خودکار در موجودی اعمال می‌شود و برای هر ماه فقط یک رکورد حقوق ثبت می‌شود. سقف بودجهٔ هزینه و هدف پس‌انداز را هم همان‌جا تعیین کن؛ اگر هزینه‌ها به سقف بودجه برسد، هشدار می‌گیری.</span></li>
+        <li><b>۲. ثبت درآمد و هزینه</b><span>از صفحهٔ <b>هزینه‌ها</b> هزینه یا درآمد دیگر ثبت کن (عنوان، مبلغ، دسته، تاریخ شمسی و توضیحات). تاریخ نمی‌تواند آینده باشد و جست‌وجو و فیلتر دسته دارد. اگر موجودی ماه کافی نباشد، برنامه پیشنهاد می‌دهد کسری از <b>پس‌انداز</b> برداشت شود؛ اگر نپذیری یا پس‌اندازی نباشد، تراکنش ثبت نمی‌شود. هر تراکنش را می‌توانی حذف کنی.</span></li>
+        <li><b>۳. مدیریت اقساط</b><span>در صفحهٔ <b>اقساط</b> قسط را با نام، مبلغ ماهانه، مبلغ کل بدهی، تعداد کل ماه‌ها، تعداد اقساط پرداخت‌شده و سررسید بعدی ثبت کن (مثلاً اگر ۸ از ۱۲ قسط را داده‌ای، ۸ را وارد کن؛ برنامه از قسط نهم ادامه می‌دهد). فقط در ماه سررسید، دکمهٔ <b>پرداخت شد</b> ظاهر می‌شود؛ با زدن آن، مبلغ از موجودی کسر و یک قسط تسویه می‌شود و اگر موجودی کافی نباشد، برداشت از پس‌انداز پیشنهاد می‌شود. اقساط عقب‌افتاده در محاسبهٔ بدهی باقی می‌مانند. بدهی باقی‌ماندهٔ کل بالای صفحه نمایش داده می‌شود.</span></li>
+        <li><b>۴. ثبت چک‌ها</b><span>در صفحهٔ <b>چک‌ها</b> چک‌ها را با عنوان، مبلغ و تاریخ سررسید ثبت کن. مبلغ چک صرفاً جهت اطلاع است و در موجودی و گزارش‌های مالی محاسبه نمی‌شود؛ اما ۷ و ۲ روز قبل از سررسید اعلان یادآوری می‌گیری و وضعیت هر چک (روز مانده، سررسید امروز یا گذشته) نشان داده می‌شود.</span></li>
+        <li><b>۵. مشاهدهٔ گزارش‌ها</b><span>در صفحهٔ <b>گزارش</b> حالت ماهانه یا سالانه را انتخاب و با فلش‌ها بین ماه‌ها/سال‌ها حرکت کن. درآمد کل، حقوق دریافتی، سایر درآمدها، هزینه، اقساط پرداختی، مبلغ باقی‌مانده، بدهی باقی‌مانده و میانگین و بیشترین دسته را با نمودار دایره‌ای، جدول جریان پول ۳ ماه/۱۲ ماه، تفکیک دسته‌بندی و مقایسه با ماه قبل ببین. با دکمهٔ PDF هم می‌توانی از گزارش خروجی بگیری (چ/ذخیره).</span></li>
+        <li><b>۶. پس‌انداز</b><span>مازاد هر ماه به‌صورت خودکار به پس‌انداز منتقل نمی‌شود. در کارت <b>پس‌انداز</b> صفحهٔ اصلی، اگر ماه جاری مازاد داشته باشی، دکمهٔ <b>انتقال مازاد</b> ظاهر می‌شود و با زدن آن مبلغ باقی‌مانده به پس‌انداز منتقل و از موجودی ماه کسر می‌شود (هر ماه فقط یک بار). برعکس، اگر هنگام هزینه یا قسط موجودی کافی نباشد، برنامه با تأیید تو از پس‌انداز برداشت می‌کند. مجموع پس‌انداز همیشه در همان کارت نمایش داده می‌شود.</span></li>
+        <li><b>۷. یادآوری‌ها</b><span>از بخش یادآوری‌ها در تنظیمات: <b>اعلان روز سررسید قسط</b> (ساعت ۹ صبح روز سررسید) و <b>یادآوری ثبت هزینه</b> (هر روز ساعت ۹ صبح و ۹ شب) را روشن یا خاموش کن. برای یادآوری چک‌ها هم فقط کافی است چک را ثبت کنی. همهٔ اعلان‌ها محلی هستند و به اینترنت نیاز ندارند؛ فقط باید مجوز اعلان را داده باشی.</span></li>
+        <li><b>۸. امنیت</b><span>در اولین اجرا PIN چهار یا شش رقمی می‌سازی. از <b>تنظیمات ← امنیت دستگاه</b> قفل خودکار (۱ تا ۳۰ دقیقه)، ورود بیومتریک (اثر انگشت) و تغییر PIN را مدیریت کن. PIN با هش SHA-256 ذخیره می‌شود و با بازنشانی اطلاعات حفظ می‌شود.</span></li>
+        <li><b>۹. پشتیبان‌گیری</b><span>از <b>تنظیمات ← پشتیبان‌گیری</b> فایل پشتیبان کامل بگیر (در پوشهٔ Documents یا Downloads گوشی ذخیره می‌شود) و بعداً بازگردانی کن. پشتیبان سریع داخلی، پشتیبان خودکار بعد از هر ثبت اطلاعات (فقط داخل برنامه) و انتخاب محل ذخیره هم در دسترس است. قبل از تعویض گوشی یا پاک‌کردن اطلاعات حتماً پشتیبان بگیر.</span></li>
+        <li><b>۱۰. شخصی‌سازی</b><span>از <b>تنظیمات ← ظاهر و اندازهٔ نوشته</b> پوستهٔ روشن/تاریک، زبان (فارسی/English) و اندازهٔ فونت (کوچک تا خیلی بزرگ) را تنظیم کن. دسته‌بندی هزینه‌ها را هم از بخش <b>دسته‌بندی‌ها</b> اضافه یا حذف کن (دسته‌ای که تراکنش دارد حذف نمی‌شود).</span></li>
+      </ol>
+      <div class="guide-tips">
+        <b>💡 نکته‌های مهم</b>
+        <ul>
+          <li>تاریخ‌ها به شمسی وارد می‌شوند؛ مثل ۱۴۰۵/۱۰/۲.</li>
+          <li>مبالغ همیشه به تومان است.</li>
+          <li>مبلغ چک‌ها در محاسبات مالی محاسبه نمی‌شود و صرفاً برای یادآوری است.</li>
+          <li>موجودی صفحهٔ اصلی یعنی: درآمد + حقوق + برداشت از پس‌انداز منهای هزینه، اقساط پرداختی و مبلغ منتقل‌شده به پس‌انداز.</li>
+          <li>با تغییر ماه شمسی، خودکار ماه جدید آغاز می‌شود و صفحهٔ ثبت حقوق تخمینی پیشنهاد می‌شود.</li>
+          <li>برای یادآوری اقساط، چک‌ها و ثبت هزینه، مجوز اعلان را به برنامه بده.</li>
+        </ul>
+      </div>
+    </section>`;
   }
   if (pane === "contact") {
     return `${heading("ارتباط با ما")}<section class="settings-section contact-card luxury-contact">
