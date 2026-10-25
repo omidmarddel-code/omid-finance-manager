@@ -1221,17 +1221,19 @@ function settings() {
         <div class="contact-hero-text">
           <p class="eyebrow">سلام! 👋</p>
           <h2>امید مرددل</h2>
-          <p class="muted-copy">برای پیشنهاد، انتقاد یا گزارش مشکل، از راه‌های ارتباطی زیر با من در تماس باش.</p>
+          <p class="contact-role">سازندهٔ برنامه</p>
         </div>
       </div>
+      <p class="contact-intro">برای پیشنهاد، انتقاد یا گزارش مشکل، از راه‌های زیر با من در تماس باش.</p>
       <div class="contact-links luxury-links">
-        <div class="contact-link luxury-link contact-phone">
+        <a class="contact-link luxury-link contact-phone" href="sms:+989197392944">
           <span class="contact-link-icon luxury-icon">📞</span>
           <span class="luxury-link-text">
-            <b>تماس تلفنی</b>
-            <span class="contact-phone-number">۰۹۱۹۷۳۹۲۹۴۴</span>
+            <b>پیامک</b>
+            <span class="contact-phone-number" dir="ltr">09197392944</span>
           </span>
-        </div>
+          <span class="luxury-arrow">›</span>
+        </a>
         <button class="contact-link luxury-link" data-action="open-link" data-url="https://t.me/+989197392944">
           <span class="contact-link-icon luxury-icon">✈️</span>
           <span class="luxury-link-text">
@@ -1249,7 +1251,6 @@ function settings() {
           <span class="luxury-arrow">›</span>
         </button>
       </div>
-      <p class="contact-signature">با احترام، امید مرددل</p>
     </section>`;
   }
   if (pane === "reset") {
