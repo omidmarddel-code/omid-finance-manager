@@ -59,3 +59,187 @@
 [2m2:39:22 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
 [2m2:39:28 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
 [2m2:39:35 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m2:44:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m2:46:00 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m2:46:07 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/i18n.js[22m
+[2m2:50:47 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m2:50:54 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m2:53:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m2:53:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:00:45 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m3:00:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m3:01:02 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m3:01:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m3:13:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:15:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:15:21 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:15:53 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:16:08 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:16:08 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m
+[2m3:16:08 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:16:50 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:16:50 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m
+[2m3:16:50 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:17:17 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:17:17 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m
+[2m3:17:17 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:17:48 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:17:48 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1973:105
+[33m  1972|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1973|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1974|      });
+     |  ^
+  1975|      state.unlocked = true;
+  1976|      startTimer();[39m
+[2m3:17:48 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1973:105
+[33m  1972|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1973|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1974|      });
+     |  ^
+  1975|      state.unlocked = true;
+  1976|      startTimer();[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:18:30 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:18:30 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1973:105
+[33m  1972|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1973|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1974|      });
+     |  ^
+  1975|      state.unlocked = true;
+  1976|      startTimer();[39m
+[2m3:18:30 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1973:105
+[33m  1972|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1973|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1974|      });
+     |  ^
+  1975|      state.unlocked = true;
+  1976|      startTimer();[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:18:52 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:18:53 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1973:105
+[33m  1972|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1973|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1974|      });
+     |  ^
+  1975|      state.unlocked = true;
+  1976|      startTimer();[39m
+[2m3:18:53 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1973:105
+[33m  1972|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1973|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1974|      });
+     |  ^
+  1975|      state.unlocked = true;
+  1976|      startTimer();[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:19:10 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:19:10 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1974:105
+[33m  1973|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1974|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1975|      });
+     |  ^
+  1976|      state.unlocked = true;
+  1977|      startTimer();[39m
+[2m3:19:11 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1974:105
+[33m  1973|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1974|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1975|      });
+     |  ^
+  1976|      state.unlocked = true;
+  1977|      startTimer();[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:19:45 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/PRO/Desktop/manger/src/app.js[39m:1974:105
+[33m  1973|        title: t("ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½"),
+  1974|        description: t("ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ ï؟½ï؟½ï؟½ï؟½ï؟½ï؟½"),
+  1975|      });
+     |  ^
+  1976|      state.unlocked = true;
+  1977|      startTimer();[39m
+      at TransformPluginContext._formatLog (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41)
+      at TransformPluginContext.error (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16)
+      at TransformPluginContext.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40585:14)
+      at async EnvironmentPluginContainer.transform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18)
+      at async loadAndTransform (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27)
+      at async viteTransformMiddleware (file:///C:/Users/PRO/Desktop/manger/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:37369:24)
+[2m3:24:34 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:29:06 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:30:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:30:20 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:30:37 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:34:41 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m3:34:43 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m4:00:52 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m4:01:57 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/style.css[22m
+[2m4:27:33 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m4:27:59 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m4:32:12 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m4:32:14 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m4:32:16 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m
+[2m4:32:18 PM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/app.js[22m

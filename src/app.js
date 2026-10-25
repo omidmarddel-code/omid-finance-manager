@@ -22,6 +22,12 @@ import {
   setLanguage,
   t,
 } from "./i18n.js";
+import {
+  installmentMonths,
+  installmentPaidCount,
+  installmentBalance,
+  installmentDueAmount,
+} from "./finance-utils.js";
 
 const root = document.querySelector("#app");
 const number = {
@@ -111,7 +117,7 @@ const escape = (text = "") =>
         c
       ],
   );
-const state = {
+export const state = {
   page: "home",
   unlocked: false,
   availableBio: false,
@@ -290,7 +296,7 @@ async function refresh() {
   });
   scheduleAutoBackup();
 }
-function savingsBalance() {
+export function savingsBalance() {
   return (
     state.savingsTransfers.reduce(
       (sum, row) => sum + Number(row.amount || 0),
@@ -303,7 +309,7 @@ function savingsBalance() {
     )
   );
 }
-function confirmSavingsFunding(amount, month) {
+export function confirmSavingsFunding(amount, month) {
   const deficit = Math.max(
     0,
     Number(amount) - Math.max(0, monthData(month).rawRemaining),
@@ -316,19 +322,17 @@ function confirmSavingsFunding(amount, month) {
     )
       ? deficit
       : null;
-  alert(
-    t(
-      savings > 0
-        ? "پس‌انداز برای پوشش کامل این هزینه کافی نیست."
-        : "پس‌اندازی نداری.",
-    ),
-  );
+  const available = Math.max(0, savings);
+  if (available <= 0) {
+    alert(t("پس‌اندازی نداری."));
+    return null;
+  }
   return confirm(
-    t(
-      "با تأیید شما، ماندهٔ پس‌انداز منفی می‌شود و هزینه ثبت خواهد شد. ادامه می‌دهی؟",
-    ),
+    "پس‌انداز برای پوشش کامل این هزینه کافی نیست. فقط مبلغ " +
+      available.toLocaleString() +
+      " تومان قابل برداشت است و ماندهٔ ماه همچنان منفی خواهد بود. ادامه می‌دهی؟",
   )
-    ? deficit
+    ? available
     : null;
 }
 const monthName = (key) => {
@@ -382,7 +386,7 @@ function salaryEstimateFor(month) {
     return +setting("monthlySalary", 0) || 0;
   return 0;
 }
-function monthData(month) {
+export function monthData(month) {
   const rows = state.transactions.filter(
     (row) => isoToJalaliKey(row.date) === month,
   );
@@ -440,7 +444,7 @@ function monthData(month) {
     savingsWithdrawals,
     due,
     rawRemaining,
-    remaining: Math.max(0, rawRemaining),
+    remaining: rawRemaining,
     payments,
   };
 }
@@ -463,7 +467,7 @@ function yearData(year) {
     ),
     due: months.reduce((sum, row) => sum + row.due, 0),
     rawRemaining,
-    remaining: Math.max(0, rawRemaining),
+    remaining: rawRemaining,
   };
 }
 async function closePreviousMonths() {
@@ -510,27 +514,6 @@ function debtRemaining() {
     0,
   );
 }
-const installmentMonths = (item) =>
-  Math.max(0, Math.trunc(Number(item.months) || 0));
-const installmentPaidCount = (item) =>
-  Math.min(
-    installmentMonths(item),
-    Math.max(0, Math.trunc(Number(item.paid_count) || 0)),
-  );
-const installmentBalance = (item) =>
-  Math.max(
-    0,
-    Number(item.total_amount) -
-      Number(item.monthly_amount) * installmentPaidCount(item),
-  );
-const installmentDueAmount = (item, offset) =>
-  Math.max(
-    0,
-    Math.min(
-      Number(item.monthly_amount),
-      Number(item.total_amount) - Number(item.monthly_amount) * offset,
-    ),
-  );
 function installmentNotificationId(installmentId, period) {
   let hash = 2166136261;
   for (const char of `${installmentId}:${period}`)
@@ -926,7 +909,7 @@ function home() {
         `<div class="pie-legend-row"><span class="pie-legend-name"><i style="--pie-color:${pieColors[index % pieColors.length]}"></i>${escape(displayCategory(category))}</span><strong>${money(amount)}</strong><small>${number.format(data.expense ? Math.round((amount / data.expense) * 100) : 0)}${getLanguage() === "en" ? "%" : "٪"}</small></div>`,
     )
     .join("");
-  return `${pageHeading("نمای کلی", "")}<section class="overview-section"><div class="overview-heading"><div><p class="eyebrow">گزارش کلی ماه</p><h2>ترکیب هزینه‌ها</h2></div><span class="overview-period">${monthName(monthNow())}</span></div>${data.expense ? `<div class="overview-chart-layout"><div class="expense-donut" style="--donut-stops:${pieStops}"><div class="donut-center"><small>هزینهٔ کل</small><strong>${money(data.expense)}</strong></div></div><div class="pie-legend">${pieLegend}</div></div>` : '<div class="pie-empty"><span>◔</span><p>با ثبت هزینه، گزارش این ماه اینجا نمایش داده می‌شود.</p></div>'}</section>${budget && percent >= 80 ? `<div class="notice"><b>${percent >= 100 ? "از سقف بودجه عبور کردی" : "به سقف بودجه نزدیک شدی"}</b><span>${money(data.expense)} از ${money(budget)}</span></div>` : ""}<section class="balance-panel"><div class="balance-top"><span>موجودی باقی‌مانده</span><span>${monthName(monthNow())}</span></div><strong class="balance-number">${money(data.remaining)}</strong><div class="balance-equation"><span>${money(data.salary + data.income)} درآمد</span><b>−</b><span>${money(data.expense)} هزینه</span><b>−</b><span>${money(data.paid)} قسط پرداختی</span></div></section><section class="metric-grid"><article><small>حقوق پیش‌بینی‌شده</small><strong>${money(salary)}</strong>${data.salaryReceived ? "<small>جایگزین با حقوق واقعی</small>" : `<button class="text-action" data-action="salary-estimate">${salary ? "✎ ویرایش حقوق تخمینی" : "＋ ثبت حقوق تخمینی"}</button>`}</article><article class="metric-mint"><small>حقوق دریافت‌شده</small><strong>${money(data.salaryActual)}</strong>${data.salaryReceived && salary && salaryDiff ? `<small class="${salaryDiff > 0 ? "positive-text" : "negative-text"}">${salaryDiff > 0 ? "+" : "−"}${money(Math.abs(salaryDiff))} نسبت به تخمین</small>` : ""}<button class="text-action" data-action="salary">${data.salaryReceived ? "✎ ویرایش حقوق واقعی" : "✅ حقوق دریافت شد"}</button></article><article><small>سایر درآمدها</small><strong>${money(data.income)}</strong><button class="text-action" data-action="income">＋ ثبت درآمد</button></article><article><small>مجموع هزینه‌ها</small><strong class="negative-text">${money(data.expense)}</strong><small>${number.format(data.expenses.length)} مورد</small></article><article><small>اقساط ماه</small><strong>${money(data.due)}</strong><small>مجموع سررسید</small></article><article><small>بدهی اقساط</small><strong>${money(debtRemaining())}</strong><small>مانده کل</small></article></section><section class="home-lower"><article class="section-block"><div class="section-title"><div><p class="eyebrow">کنترل خرج‌کرد</p><h2>بودجهٔ ماه</h2></div><button class="subtle-button" data-page="settings">تنظیم</button></div>${budget ? `<div class="budget-line"><span>${money(data.expense)} <small>از ${money(budget)}</small></span><b>${number.format(Math.round(percent))}٪</b></div><div class="progress-track"><i style="width:${percent}%"></i></div><p class="muted-copy">ماندهٔ قابل‌خرج: ${money(Math.max(0, budget - data.expense))}</p>` : '<p class="muted-copy">بودجهٔ ماهانه را برای کنترل هزینه‌ها تنظیم کن.</p><button class="outline-button" data-page="settings">تنظیم بودجه ←</button>'}</article><article class="section-block"><div class="section-title"><div><p class="eyebrow">آخرین فعالیت‌ها</p><h2>تراکنش‌های ماه</h2></div><button class="subtle-button" data-page="expenses">همه</button></div>${latest.length ? transactionRows(latest) : '<p class="muted-copy">هنوز تراکنشی ثبت نشده است.</p>'}</article></section>`;
+  return `${pageHeading("نمای کلی", "")}<section class="overview-section"><div class="overview-heading"><div><p class="eyebrow">گزارش کلی ماه</p><h2>ترکیب هزینه‌ها</h2></div><span class="overview-period">${monthName(monthNow())}</span></div>${data.expense ? `<div class="overview-chart-layout"><div class="expense-donut" style="--donut-stops:${pieStops}"><div class="donut-center"><small>هزینهٔ کل</small><strong>${money(data.expense)}</strong></div></div><div class="pie-legend">${pieLegend}</div></div>` : '<div class="pie-empty"><span>◔</span><p>با ثبت هزینه، گزارش این ماه اینجا نمایش داده می‌شود.</p></div>'}</section>${budget && percent >= 80 ? `<div class="notice"><b>${percent >= 100 ? "از سقف بودجه عبور کردی" : "به سقف بودجه نزدیک شدی"}</b><span>${money(data.expense)} از ${money(budget)}</span></div>` : ""}<section class="balance-panel"><div class="balance-top"><span>موجودی باقی‌مانده</span><span>${monthName(monthNow())}</span></div><strong class="balance-number ${data.remaining < 0 ? "negative-text" : data.remaining > 0 ? "positive-text" : ""}">${money(data.remaining)}</strong><div class="balance-equation"><span>${money(data.salary + data.income)} درآمد</span><b>−</b><span>${money(data.expense)} هزینه</span><b>−</b><span>${money(data.paid)} قسط پرداختی</span></div></section><section class="metric-grid"><article><small>حقوق پیش‌بینی‌شده</small><strong>${money(salary)}</strong>${data.salaryReceived ? "<small>جایگزین با حقوق واقعی</small>" : `<button class="text-action" data-action="salary-estimate">${salary ? "✎ ویرایش حقوق تخمینی" : "＋ ثبت حقوق تخمینی"}</button>`}</article><article class="metric-mint"><small>حقوق دریافت‌شده</small><strong>${money(data.salaryActual)}</strong>${data.salaryReceived && salary && salaryDiff ? `<small class="${salaryDiff > 0 ? "positive-text" : "negative-text"}">${salaryDiff > 0 ? "+" : "−"}${money(Math.abs(salaryDiff))} نسبت به تخمین</small>` : ""}<button class="text-action" data-action="salary">${data.salaryReceived ? "✎ ویرایش حقوق واقعی" : "✅ حقوق دریافت شد"}</button></article><article><small>سایر درآمدها</small><strong>${money(data.income)}</strong><button class="text-action" data-action="income">＋ ثبت درآمد</button></article><article><small>مجموع هزینه‌ها</small><strong class="negative-text">${money(data.expense)}</strong><small>${number.format(data.expenses.length)} مورد</small></article><article><small>اقساط ماه</small><strong>${money(data.due)}</strong><small>مجموع سررسید</small></article><article><small>بدهی اقساط</small><strong>${money(debtRemaining())}</strong><small>مانده کل</small></article></section><section class="home-lower"><article class="section-block"><div class="section-title"><div><p class="eyebrow">کنترل خرج‌کرد</p><h2>بودجهٔ ماه</h2></div><button class="subtle-button" data-page="settings">تنظیم</button></div>${budget ? `<div class="budget-line"><span>${money(data.expense)} <small>از ${money(budget)}</small></span><b>${number.format(Math.round(percent))}٪</b></div><div class="progress-track"><i style="width:${percent}%"></i></div><p class="muted-copy">ماندهٔ قابل‌خرج: ${money(Math.max(0, budget - data.expense))}</p>` : '<p class="muted-copy">بودجهٔ ماهانه را برای کنترل هزینه‌ها تنظیم کن.</p><button class="outline-button" data-page="settings">تنظیم بودجه ←</button>'}</article><article class="section-block"><div class="section-title"><div><p class="eyebrow">آخرین فعالیت‌ها</p><h2>تراکنش‌های ماه</h2></div><button class="subtle-button" data-page="expenses">همه</button></div>${latest.length ? transactionRows(latest) : '<p class="muted-copy">هنوز تراکنشی ثبت نشده است.</p>'}</article></section>`;
 }
 function expenses() {
   const rows = state.transactions
@@ -1081,7 +1064,7 @@ function reports() {
   // Use the same numbers shown in the metric cards (exact reporting period),
   // not the flow buckets, so the donut always matches the report itself.
   const chartSeries = [
-    ["income", "درآمد", "#3fbf7f", (+data.salaryEstimate || 0) + (+data.income || 0)],
+    ["income", "درآمد", "#3fbf7f", (+data.salary || 0) + (+data.income || 0)],
     ["expense", "هزینه", "#e5484d", +data.expense || 0],
     ["loan", "قسط", "#3d7fd8", +data.paid || 0],
   ];
@@ -1134,8 +1117,17 @@ function reports() {
     ["بیشترین دسته", highest?.[0] || "—"],
   ]
     .map(
-      ([label, value]) =>
-        `<article><small>${label}</small><strong>${typeof value === "number" ? money(value) : escape(value)}</strong></article>`,
+      ([label, value]) => {
+        const cls =
+          label === "مبلغ باقی‌مانده" && typeof value === "number"
+            ? value < 0
+              ? "negative-text"
+              : value > 0
+                ? "positive-text"
+                : ""
+            : "";
+        return `<article><small>${label}</small><strong class="${cls}">${typeof value === "number" ? money(value) : escape(value)}</strong></article>`;
+      },
     )
     .join(
       "",
@@ -1708,6 +1700,9 @@ async function handleForm(form) {
       if (savingsWithdrawal === null) return;
     }
     if (form.dataset.kind === "salary") {
+      if (+value.amount <= 0) {
+        return toast("مبلغ حقوق باید بزرگتر از صفر باشد.", true);
+      }
       const salaryRows = state.transactions.filter(
         (row) =>
           row.kind === "salary" && isoToJalaliKey(row.date) === monthNow(),
