@@ -11,8 +11,8 @@ import {
   clearStore,
   initializeDatabase,
   isNativeDatabase,
-  remove,
-  save,
+  remove as dbRemove,
+  save as dbSave,
 } from "./db.js";
 import {
   displayCategory,
@@ -30,6 +30,16 @@ import {
 } from "./finance-utils.js";
 
 const root = document.querySelector("#app");
+// Every data mutation schedules a debounced in-app auto-backup, so the latest
+// snapshot (and the quick-restore target) always reflects the newest change.
+async function save(storeName, row) {
+  await dbSave(storeName, row);
+  scheduleAutoBackup();
+}
+async function remove(storeName, key) {
+  await dbRemove(storeName, key);
+  scheduleAutoBackup();
+}
 const number = {
   format: (amount, options) =>
     new Intl.NumberFormat(
@@ -1150,7 +1160,15 @@ function backupSection() {
     setting("backupDir", "documents") === "downloads"
       ? "پوشهٔ Downloads"
       : "پوشهٔ Documents";
-  return `<section class="settings-section backup-section"><p class="eyebrow">انتقال اطلاعات</p><h2>پشتیبان‌گیری</h2><p class="muted-copy">${native ? `فایل پشتیبان در ${folder} گوشی ذخیره می‌شود و می‌توانی آن را در گالری، فایل‌ها یا فضای ابری خودت نگه داری.` : "فایل پشتیبان در پوشهٔ دانلود دستگاه ذخیره می‌شود."}</p>${last ? `<p class="muted-copy backup-last">آخرین پشتیبان: ${escape(last.name)}</p>` : ""}<div class="backup-actions"><button class="outline-button full-button" data-action="backup">📥 ذخیرهٔ فایل پشتیبان</button><button class="outline-button full-button" data-action="restore">📂 بازگردانی از فایل پشتیبان</button></div>${native ? `<label>محل ذخیرهٔ فایل<select id="backupDir"><option value="documents" ${setting("backupDir", "documents") === "documents" ? "selected" : ""}>پوشهٔ Documents</option><option value="downloads" ${setting("backupDir", "documents") === "downloads" ? "selected" : ""}>پوشهٔ Downloads</option></select></label>` : ""}<label class="toggle-row"><span>نگه‌داشتن پشتیبان داخل برنامه<small>آخرین نسخه در خود برنامه ذخیره می‌شود و سریع برگردانده می‌شود</small></span><input type="checkbox" id="backupAutoSave" ${setting("backupAutoSave", true) ? "checked" : ""} /></label><div class="backup-actions">${last ? `<button class="outline-button full-button" data-action="quick-backup">🔄 پشتیبان سریع</button>` : ""}${last?.uri ? `<button class="outline-button full-button" data-action="quick-restore">↩️ بازگردانی از آخرین پشتیبان داخلی</button>` : ""}</div><p class="muted-copy backup-auto">پشتیبان خودکار بعد از هر ثبت اطلاعات فعال است.</p></section>`;
+  let pickedBackup = null;
+  try {
+    pickedBackup = JSON.parse(
+      localStorage.getItem("hamrah-picked-backup") || "null",
+    );
+  } catch {
+    pickedBackup = null;
+  }
+  return `<section class="settings-section backup-section"><p class="eyebrow">انتقال اطلاعات</p><h2>پشتیبان‌گیری</h2><p class="muted-copy">${native ? `فایل پشتیبان در ${folder} گوشی ذخیره می‌شود و می‌توانی آن را در گالری، فایل‌ها یا فضای ابری خودت نگه داری.` : "فایل پشتیبان در پوشهٔ دانلود دستگاه ذخیره می‌شود."}</p>${last ? `<p class="muted-copy backup-last">آخرین پشتیبان: ${escape(last.name)}</p>` : ""}<div class="backup-actions"><button class="outline-button full-button" data-action="backup">📥 ذخیرهٔ فایل پشتیبان</button><button class="outline-button full-button" data-action="restore">📂 بازگردانی از فایل پشتیبان</button></div>${pickedBackup ? `<div class="backup-actions"><button class="outline-button full-button" data-action="restore-picked">⏱ بازگردانی همان فایل: ${escape(pickedBackup.name)}</button></div>` : ""}${native ? `<label>محل ذخیرهٔ فایل<select id="backupDir"><option value="documents" ${setting("backupDir", "documents") === "documents" ? "selected" : ""}>پوشهٔ Documents</option><option value="downloads" ${setting("backupDir", "documents") === "downloads" ? "selected" : ""}>پوشهٔ Downloads</option></select></label>` : ""}<label class="toggle-row"><span>نگه‌داشتن پشتیبان داخل برنامه<small>آخرین نسخه در خود برنامه ذخیره می‌شود و سریع برگردانده می‌شود</small></span><input type="checkbox" id="backupAutoSave" ${setting("backupAutoSave", true) ? "checked" : ""} /></label><div class="backup-actions">${last ? `<button class="outline-button full-button" data-action="quick-backup">🔄 پشتیبان سریع</button>` : ""}${last?.uri ? `<button class="outline-button full-button" data-action="quick-restore">↩️ بازگردانی از آخرین پشتیبان داخلی</button>` : ""}</div><p class="muted-copy backup-auto">پشتیبان خودکار بعد از هر ثبت اطلاعات فعال است.</p></section>`;
 }
 function settings() {
   const pane = state.settingsPane || "home";
@@ -1547,43 +1565,45 @@ async function restorePick() {
   const file = input.files?.[0];
   input.remove();
   if (!file) return;
+  // Remember the picked file so it can be restored again from the same place.
   try {
-    await restoreText(await file.text());
+    const contents = await file.text();
+    JSON.parse(contents); // validate before remembering
+    localStorage.setItem(
+      "hamrah-picked-backup",
+      JSON.stringify({
+        name: file.name,
+        at: new Date().toISOString(),
+        contents,
+      }),
+    );
+    await restoreText(contents);
   } catch (error) {
-    toast(error.message, true);
+    toast(error.message || "پشتیبان داخلی خوانده نشد.", true);
   }
 }
 async function quickBackup() {
-  const payload = { app: "hamrah-finance", version: 2 };
-  for (const table of [
-    "transactions",
-    "installments",
-    "payments",
-    "checks",
-    "categories",
-    "settings",
-    "budgets",
-    "savings_transfers",
-    "savings_movements",
-  ])
-    payload[table] = await all(table);
-  const contents = JSON.stringify(payload);
-  const name = `hamrah-quick-${Date.now()}.json`;
-  if (Capacitor.isNativePlatform()) {
-    const result = await Filesystem.writeFile({
-      path: name,
-      data: contents,
-      directory: Directory.Data,
-      encoding: Encoding.UTF8,
-      recursive: true,
-    });
-    return { name, uri: result.uri || name, at: new Date().toISOString() };
-  }
-  download(name, contents, "application/json");
-  return { name, uri: "", at: new Date().toISOString() };
+  return autoBackup();
 }
 async function quickRestore() {
   if (!state.lastBackup?.uri) return;
+  if (state.lastBackup.uri === "local") {
+    const raw = localStorage.getItem("hamrah-auto-backup");
+    if (!raw) {
+      toast("پشتیبان داخلی خوانده نشد.", true);
+      return;
+    }
+    if (
+      !confirm(
+        t(
+          "اطلاعات فعلی با آخرین پشتیبان داخل برنامه جایگزین می‌شود. ادامه می‌دهی؟",
+        ),
+      )
+    )
+      return;
+    await restoreText(JSON.parse(raw).contents);
+    return;
+  }
   const result = await Filesystem.readFile({
     path: state.lastBackup.name,
     directory: Directory.Data,
@@ -1606,7 +1626,6 @@ async function quickRestore() {
 async function saveQuickBackup() {
   try {
     const record = await quickBackup();
-    await setSetting("lastBackup", record);
     state.lastBackup = record;
     render();
     toast("پشتیبان سریع داخل برنامه ذخیره شد.");
@@ -1616,7 +1635,6 @@ async function saveQuickBackup() {
 }
 let autoBackupTimer = null;
 async function autoBackup() {
-  if (!Capacitor.isNativePlatform()) return;
   const payload = { app: "hamrah-finance", version: 2 };
   for (const table of [
     "transactions",
@@ -1633,18 +1651,23 @@ async function autoBackup() {
   const contents = JSON.stringify(payload);
   const name = "hamrah-auto-backup.json";
   try {
-    const result = await Filesystem.writeFile({
-      path: name,
-      data: contents,
-      directory: Directory.Data,
-      encoding: Encoding.UTF8,
-      recursive: true,
-    });
-    const record = {
-      name,
-      uri: result.uri || name,
-      at: new Date().toISOString(),
-    };
+    let record;
+    if (Capacitor.isNativePlatform()) {
+      const result = await Filesystem.writeFile({
+        path: name,
+        data: contents,
+        directory: Directory.Data,
+        encoding: Encoding.UTF8,
+        recursive: true,
+      });
+      record = { name, uri: result.uri || name, at: new Date().toISOString() };
+    } else {
+      localStorage.setItem(
+        "hamrah-auto-backup",
+        JSON.stringify({ name, at: new Date().toISOString(), contents }),
+      );
+      record = { name, uri: "local", at: new Date().toISOString() };
+    }
     state.lastBackup = record;
     if (setting("backupAutoSave", true)) await setSetting("lastBackup", record);
   } catch (error) {
@@ -1658,24 +1681,12 @@ function scheduleAutoBackup() {
   }, 800);
 }
 async function applyRestoredData() {
-  state.lastBackup = setting("lastBackup", null);
   await refresh();
   await prepareCurrentMonth();
   document.documentElement.dataset.theme = setting("theme", "light");
   applyFontSize();
-  state.lastBackup = setting("lastBackup", null);
-  if (state.lastBackup?.uri) {
-    try {
-      await Filesystem.deleteFile({
-        path: state.lastBackup.name,
-        directory: Directory.Data,
-      });
-    } catch (error) {
-      /* already gone */
-    }
-  }
-  await setSetting("lastBackup", "");
-  state.lastBackup = null;
+  // The rolling in-app backup is preserved (and re-taken after restore) so the
+  // quick-restore target stays available.
   if (Capacitor.isNativePlatform()) {
     await scheduleInstallmentNotifications();
     await scheduleExpenseLogReminders();
@@ -2398,6 +2409,20 @@ root.addEventListener("click", async (event) => {
         break;
       case "restore":
         await restorePick();
+        break;
+      case "restore-picked":
+        try {
+          const picked = JSON.parse(
+            localStorage.getItem("hamrah-picked-backup") || "null",
+          );
+          if (!picked) {
+            toast("پشتیبان داخلی خوانده نشد.", true);
+            break;
+          }
+          await restoreText(picked.contents);
+        } catch (error) {
+          toast(error.message || "پشتیبان داخلی خوانده نشد.", true);
+        }
         break;
       case "quick-backup":
         await saveQuickBackup();

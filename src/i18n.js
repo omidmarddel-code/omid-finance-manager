@@ -491,6 +491,7 @@ const translations = {
   "برای پیشنهاد، انتقاد یا گزارش مشکل، از راه‌های زیر با من در تماس باش.":
     "For suggestions, feedback, or to report an issue, reach me through the channels below.",
   پیامک: "SMS",
+  "بازگردانی همان فایل:": "Restore same file:",
   "تراکنش‌ها، اقساط و تنظیمات پاک می‌شوند؛ PIN ورود حفظ می‌شود.":
     "Transactions, installments and settings will be cleared. Your sign-in PIN will be kept.",
   "راه‌اندازی ناموفق بود": "Setup failed",
