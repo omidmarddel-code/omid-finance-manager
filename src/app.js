@@ -138,6 +138,7 @@ export const state = {
   categories: [],
   settings: {},
   budgets: [],
+  categoryBudgets: [],
   savingsTransfers: [],
   savingsMovements: [],
   pendingMonthEntry: false,
@@ -229,6 +230,7 @@ async function refresh() {
     categories,
     settings,
     budgets,
+    categoryBudgets,
     savingsTransfers,
     savingsMovements,
   ] = await Promise.all(
@@ -240,6 +242,7 @@ async function refresh() {
       "categories",
       "settings",
       "budgets",
+      "category_budgets",
       "savings_transfers",
       "savings_movements",
     ].map(all),
@@ -301,6 +304,7 @@ async function refresh() {
     categories,
     settings: Object.fromEntries(settings.map((row) => [row.key, row.value])),
     budgets,
+    categoryBudgets,
     savingsTransfers,
     savingsMovements,
   });
@@ -457,6 +461,30 @@ export function monthData(month) {
     remaining: rawRemaining,
     payments,
   };
+}
+
+/**
+ * Get the budget amount for a specific category in a specific month.
+ */
+function getCategoryBudget(categoryId, month) {
+  const row = state.categoryBudgets.find(
+    (b) => b.category_id === categoryId && b.month === month,
+  );
+  return row ? Number(row.amount || 0) : 0;
+}
+
+/**
+ * Calculate total spending for a specific category in a specific month.
+ */
+function getCategorySpending(categoryName, month) {
+  const rows = state.transactions.filter(
+    (row) =>
+      row.kind === "expense" &&
+      (row.category || "سایر") === categoryName &&
+      row.date &&
+      isoToJalaliKey(row.date) === month,
+  );
+  return rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
 }
 function yearData(year) {
   const months = Array.from(
@@ -922,6 +950,7 @@ function home() {
   return `${pageHeading("نمای کلی", "")}<section class="overview-section"><div class="overview-heading"><div><p class="eyebrow">گزارش کلی ماه</p><h2>ترکیب هزینه‌ها</h2></div><span class="overview-period">${monthName(monthNow())}</span></div>${data.expense ? `<div class="overview-chart-layout"><div class="expense-donut" style="--donut-stops:${pieStops}"><div class="donut-center"><small>هزینهٔ کل</small><strong>${money(data.expense)}</strong></div></div><div class="pie-legend">${pieLegend}</div></div>` : '<div class="pie-empty"><span>◔</span><p>با ثبت هزینه، گزارش این ماه اینجا نمایش داده می‌شود.</p></div>'}</section>${budget && percent >= 80 ? `<div class="notice"><b>${percent >= 100 ? "از سقف بودجه عبور کردی" : "به سقف بودجه نزدیک شدی"}</b><span>${money(data.expense)} از ${money(budget)}</span></div>` : ""}<section class="balance-panel"><div class="balance-top"><span>موجودی باقی‌مانده</span><span>${monthName(monthNow())}</span></div><strong class="balance-number ${data.remaining < 0 ? "negative-text" : data.remaining > 0 ? "positive-text" : ""}">${money(data.remaining)}</strong><div class="balance-equation"><span>${money(data.salary + data.income)} درآمد</span><b>−</b><span>${money(data.expense)} هزینه</span><b>−</b><span>${money(data.paid)} قسط پرداختی</span></div></section><section class="metric-grid"><article><small>حقوق پیش‌بینی‌شده</small><strong>${money(salary)}</strong>${data.salaryReceived ? "<small>جایگزین با حقوق واقعی</small>" : `<button class="text-action" data-action="salary-estimate">${salary ? "✎ ویرایش حقوق تخمینی" : "＋ ثبت حقوق تخمینی"}</button>`}</article><article class="metric-mint"><small>حقوق دریافت‌شده</small><strong>${money(data.salaryActual)}</strong>${data.salaryReceived && salary && salaryDiff ? `<small class="${salaryDiff > 0 ? "positive-text" : "negative-text"}">${salaryDiff > 0 ? "+" : "−"}${money(Math.abs(salaryDiff))} نسبت به تخمین</small>` : ""}<button class="text-action" data-action="salary">${data.salaryReceived ? "✎ ویرایش حقوق واقعی" : "✅ حقوق دریافت شد"}</button></article><article><small>سایر درآمدها</small><strong>${money(data.income)}</strong><button class="text-action" data-action="income">＋ ثبت درآمد</button></article><article><small>مجموع هزینه‌ها</small><strong class="negative-text">${money(data.expense)}</strong><small>${number.format(data.expenses.length)} مورد</small></article><article><small>اقساط ماه</small><strong>${money(data.due)}</strong><small>مجموع سررسید</small></article><article><small>بدهی اقساط</small><strong>${money(debtRemaining())}</strong><small>مانده کل</small></article></section><section class="home-lower"><article class="section-block"><div class="section-title"><div><p class="eyebrow">کنترل خرج‌کرد</p><h2>بودجهٔ ماه</h2></div><button class="subtle-button" data-page="settings">تنظیم</button></div>${budget ? `<div class="budget-line"><span>${money(data.expense)} <small>از ${money(budget)}</small></span><b>${number.format(Math.round(percent))}٪</b></div><div class="progress-track"><i style="width:${percent}%"></i></div><p class="muted-copy">ماندهٔ قابل‌خرج: ${money(Math.max(0, budget - data.expense))}</p>` : '<p class="muted-copy">بودجهٔ ماهانه را برای کنترل هزینه‌ها تنظیم کن.</p><button class="outline-button" data-page="settings">تنظیم بودجه ←</button>'}</article><article class="section-block"><div class="section-title"><div><p class="eyebrow">آخرین فعالیت‌ها</p><h2>تراکنش‌های ماه</h2></div><button class="subtle-button" data-page="expenses">همه</button></div>${latest.length ? transactionRows(latest) : '<p class="muted-copy">هنوز تراکنشی ثبت نشده است.</p>'}</article></section>`;
 }
 function expenses() {
+  const current = monthNow();
   const rows = state.transactions
     .filter((item) => item.kind === "expense")
     .filter((item) => state.filter === "all" || item.category === state.filter)
@@ -931,7 +960,23 @@ function expenses() {
         .includes(state.search.toLowerCase()),
     )
     .sort((a, b) => b.date.localeCompare(a.date));
-  return `${pageHeading("هزینه‌ها", "ثبت و بررسی خرج‌کرد")}<section class="list-toolbar"><label class="search-field">⌕ <input id="search" value="${escape(state.search)}" placeholder="جست‌وجوی هزینه..." /></label><select id="categoryFilter"><option value="all">همه دسته‌ها</option>${state.categories.map((item) => `<option value="${escape(item.name)}" ${item.name === state.filter ? "selected" : ""}>${escape(displayCategory(item.name))}</option>`).join("")}</select><button class="primary-button" data-action="expense">＋ ثبت هزینه</button></section><section class="list-summary"><span>جمع نتایج</span><strong>${money(rows.reduce((sum, row) => sum + +row.amount, 0))}</strong><small>${number.format(rows.length)} تراکنش</small></section><section class="section-block">${rows.length ? transactionRows(rows, true) : '<div class="empty-state"><b>هزینه‌ای پیدا نشد</b><small>فیلتر را تغییر بده یا هزینه‌ای ثبت کن.</small></div>'}</section>`;
+
+  // Category budget summary for current month
+  const categorySpending = {};
+  state.categories.forEach((cat) => {
+    categorySpending[cat.id] = getCategorySpending(cat.name, current);
+  });
+  const categoryBudgetRows = state.categories
+    .map((cat) => {
+      const spent = categorySpending[cat.id] || 0;
+      const budget = getCategoryBudget(cat.id, current);
+      const exceeded = budget > 0 && spent > budget;
+      const percent = budget ? Math.min(100, (spent / budget) * 100) : 0;
+      return `<div class="category-budget-row${exceeded ? ' exceeded' : ''}"><span class="category-budget-name">${escape(displayCategory(cat.name))}</span><div class="category-budget-bar"><div class="category-budget-fill${exceeded ? ' exceeded' : ''}" style="width:${percent}%"></div></div><span class="category-budget-amount">${money(spent)}${budget ? ` / ${money(budget)}` : ''}</span>${budget ? `<button class="text-action" data-action="edit-category-budget" data-id="${escape(cat.id)}">✎</button>` : `<button class="text-action" data-action="add-category-budget" data-id="${escape(cat.id)}">＋</button>`}</div>`;
+    })
+    .join("");
+
+  return `${pageHeading("هزینه‌ها", "ثبت و بررسی خرج‌کرد")}<section class="list-toolbar"><label class="search-field">⌕ <input id="search" value="${escape(state.search)}" placeholder="جست‌وجوی هزینه..." /></label><select id="categoryFilter"><option value="all">همه دسته‌ها</option>${state.categories.map((item) => `<option value="${escape(item.name)}" ${item.name === state.filter ? "selected" : ""}>${escape(displayCategory(item.name))}</option>`).join("")}</select><button class="primary-button" data-action="expense">＋ ثبت هزینه</button></section>${categoryBudgetRows ? `<section class="category-budget-summary"><h2>بودجه دسته‌ای-${monthName(current)}</h2><div class="category-budget-list">${categoryBudgetRows}</div></section>` : ""}<section class="list-summary"><span>جمع نتایج</span><strong>${money(rows.reduce((sum, row) => sum + +row.amount, 0))}</strong><small>${number.format(rows.length)} تراکنش</small></section><section class="section-block">${rows.length ? transactionRows(rows, true) : '<div class="empty-state"><b>هزینه‌ای پیدا نشد</b><small>فیلتر را تغییر بده یا هزینه‌ای ثبت کن.</small></div>'}</section>`;
 }
 function themePanel() {
   const selectedTheme = setting("theme", "light");
@@ -1021,6 +1066,31 @@ function checkForm(item = null) {
   const title = item ? "ویرایش چک" : "ثبت چک جدید";
   const body = `<form data-form="check" data-id="${item ? escape(item.id) : ""}">${input("عنوان یا شماره چک", "title", "text", 'maxlength="60"', item?.title || "")}${amountInput("مبلغ چک (تومان)", "amount", item?.amount || "")}${jalaliDateInput("تاریخ سررسید چک", "due_date", item?.due_date || dateNow())}<p class="muted-copy">مبلغ چک فقط جهت اطلاع ثبت می‌شود و در موجودی، درآمد و هزینه محاسبه نخواهد شد.</p><button class="primary-button">${item ? "ذخیره تغییرات" : "ثبت چک"}</button></form>`;
   modal(title, body);
+}
+function categoryBudgetForm(item = null) {
+  const isEdit = !!item && item.amount !== undefined;
+  const current = monthNow();
+  let categoryName = "";
+  let budgetAmount = "";
+  let budgetId = "";
+  let categoryId = "";
+
+  if (isEdit) {
+    categoryId = item.category_id;
+    budgetAmount = formatAmount(item.amount);
+    budgetId = item.id;
+    const cat = state.categories.find((c) => c.id === categoryId);
+    categoryName = cat ? displayCategory(cat.name) : "";
+  } else {
+    categoryId = item?.category_id || "";
+    const cat = state.categories.find((c) => c.id === categoryId);
+    categoryName = cat ? displayCategory(cat.name) : "";
+  }
+
+  modal(
+    isEdit ? "ویرایش بودجه دسته" : "تنظیم بودجه دسته",
+    `<form data-form="category_budget" data-id="${escape(budgetId)}" data-category-id="${escape(categoryId)}">${input("دسته", "category_name", "text", 'maxlength="60" readonly', categoryName)}${amountInput("مبلغ بودجه (تومان)", "amount", budgetAmount)}<p class="muted-copy">بودجه برای ماه ${monthName(current)} تعریف می‌شود. اگر هزینهٔ این دسته از سقف بودجه گذشته باشد، نام دسته قرمز نمایش داده می‌شود.</p><button class="primary-button">${isEdit ? "ذخیره تغییرات" : "ثبت بودجه"}</button></form>`,
+  );
 }
 function checks() {
   const rows = state.checks
@@ -1947,6 +2017,28 @@ async function handleForm(form) {
     render();
     toast(savedMessage);
   }
+  if (form.dataset.form === "category_budget") {
+    const categoryId = form.dataset.categoryId;
+    const amount = Number(value.amount);
+    if (!categoryId)
+      return toast("دسته انتخاب نشده است.", true);
+    if (!Number.isSafeInteger(amount) || amount <= 0)
+      return toast("مبلغ بودجه باید عدد صحیحِ مثبت و به تومان باشد.", true);
+    const current = monthNow();
+    const existing = form.dataset.id
+      ? state.categoryBudgets.find((row) => row.id === form.dataset.id)
+      : null;
+    await save("category_budgets", {
+      id: existing?.id || id(),
+      category_id: categoryId,
+      month: current,
+      amount,
+    });
+    await refresh();
+    state.page = "expenses";
+    render();
+    toast(existing ? "بودجه دسته بروزرسانی شد." : "بودجه دسته ثبت شد.");
+  }
   if (form.dataset.form === "month-entry") {
     const period = monthNow();
     await setSetting("monthlySalary", +value.salaryEstimate || 0);
@@ -2301,6 +2393,14 @@ root.addEventListener("click", async (event) => {
       case "edit-check":
         checkForm(state.checks.find((row) => row.id === key));
         break;
+      case "add-category-budget":
+        categoryBudgetForm({ category_id: key });
+        break;
+      case "edit-category-budget": {
+        const budget = state.categoryBudgets.find((row) => row.id === key);
+        if (budget) categoryBudgetForm(budget);
+        break;
+      }
       case "delete-check": {
         if (confirm(t("این چک حذف شود؟"))) {
           await remove("checks", key);

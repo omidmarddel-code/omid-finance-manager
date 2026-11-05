@@ -103,6 +103,18 @@ select,input,textarea{color:#263b52}
 .loan-info b{color:var(--soft)}
 .installment-loan-info{margin:10px 0 0;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:10px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
 .installment-loan-info b{color:var(--soft)}
+.category-budget-summary{margin:12px 0;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.category-budget-summary h2{margin:0;padding:12px 15px;font-size:13px;border-bottom:1px solid var(--line);color:var(--soft)}
+.category-budget-list{display:grid;gap:6px;padding:10px 15px}
+.category-budget-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-radius:8px;transition:background .2s}
+.category-budget-row.exceeded{background:rgba(215,85,82,.08)}
+.category-budget-name{min-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--soft)}
+.category-budget-row.exceeded .category-budget-name{color:var(--coral);font-weight:600}
+.category-budget-bar{flex:1;height:6px;background:rgba(68,99,132,.12);border-radius:3px;overflow:hidden}
+.category-budget-fill{height:100%;background:linear-gradient(90deg,#55a8e9,#2878d8);border-radius:3px;transition:width .3s}
+.category-budget-fill.exceeded{background:linear-gradient(90deg,#e16d78,#c54a44)}
+.category-budget-amount{font-size:10px;color:var(--muted);white-space:nowrap}
+.category-budget-amount b{color:var(--soft)}
 .segmented-control{border-color:rgba(57,87,121,.14);background:rgba(255,255,255,.58)}
 .segmented-control button{color:#75869a}
 .segmented-control .selected{background:rgba(255,255,255,.94);color:#2878d8;box-shadow:0 2px 8px #31577b18}
