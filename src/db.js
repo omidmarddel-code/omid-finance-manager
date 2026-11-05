@@ -3,7 +3,7 @@ import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
 
 const stores = {
   transactions: { key: 'id', fields: ['id', 'kind', 'title', 'amount', 'category', 'date', 'note'] },
-  installments: { key: 'id', fields: ['id', 'name', 'monthly_amount', 'total_amount', 'months', 'paid_count', 'start_date', 'due_day', 'next_due_date', 'due_month'] },
+  installments: { key: 'id', fields: ['id', 'name', 'monthly_amount', 'total_amount', 'months', 'paid_count', 'start_date', 'due_day', 'next_due_date', 'due_month', 'loan_amount', 'interest_rate'] },
   payments: { key: 'id', fields: ['id', 'installment_id', 'period', 'amount', 'paid_at'] },
   categories: { key: 'id', fields: ['id', 'name'] },
   settings: { key: 'key', fields: ['key', 'value'] },
@@ -15,7 +15,7 @@ const stores = {
 
 const schema = `
   CREATE TABLE IF NOT EXISTS transactions (id TEXT PRIMARY KEY, kind TEXT NOT NULL, title TEXT NOT NULL, amount REAL NOT NULL, category TEXT, date TEXT NOT NULL, note TEXT);
-  CREATE TABLE IF NOT EXISTS installments (id TEXT PRIMARY KEY, name TEXT NOT NULL, monthly_amount REAL NOT NULL, total_amount REAL NOT NULL, months INTEGER NOT NULL, paid_count INTEGER NOT NULL DEFAULT 0, start_date TEXT NOT NULL, due_day INTEGER NOT NULL, next_due_date TEXT, due_month TEXT);
+  CREATE TABLE IF NOT EXISTS installments (id TEXT PRIMARY KEY, name TEXT NOT NULL, monthly_amount REAL NOT NULL, total_amount REAL NOT NULL, months INTEGER NOT NULL, paid_count INTEGER NOT NULL DEFAULT 0, start_date TEXT NOT NULL, due_day INTEGER NOT NULL, next_due_date TEXT, due_month TEXT, loan_amount REAL DEFAULT 0, interest_rate REAL DEFAULT 0);
   CREATE TABLE IF NOT EXISTS payments (id TEXT PRIMARY KEY, installment_id TEXT NOT NULL, period TEXT NOT NULL, amount REAL NOT NULL, paid_at TEXT NOT NULL, UNIQUE(installment_id, period));
   CREATE TABLE IF NOT EXISTS categories (id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE);
   CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -59,6 +59,8 @@ export async function initializeDatabase() {
     const installmentColumns = new Set((await connection.query('PRAGMA table_info(installments)')).values?.map((column) => column.name) ?? []);
     if (!installmentColumns.has('next_due_date')) await connection.execute('ALTER TABLE installments ADD COLUMN next_due_date TEXT');
     if (!installmentColumns.has('due_month')) await connection.execute('ALTER TABLE installments ADD COLUMN due_month TEXT');
+    if (!installmentColumns.has('loan_amount')) await connection.execute('ALTER TABLE installments ADD COLUMN loan_amount REAL DEFAULT 0');
+    if (!installmentColumns.has('interest_rate')) await connection.execute('ALTER TABLE installments ADD COLUMN interest_rate REAL DEFAULT 0');
     const movementColumns = new Set((await connection.query('PRAGMA table_info(savings_movements)')).values?.map((column) => column.name) ?? []);
     if (!movementColumns.has('transaction_id')) await connection.execute('ALTER TABLE savings_movements ADD COLUMN transaction_id TEXT');
     if (!movementColumns.has('payment_id')) await connection.execute('ALTER TABLE savings_movements ADD COLUMN payment_id TEXT');

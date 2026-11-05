@@ -97,6 +97,12 @@ select,input,textarea{color:#263b52}
 .status-pill.is-paid{background:rgba(40,165,139,.12);color:#16856f}
 .installment-numbers{border-color:rgba(54,82,114,.11)}
 .pay-button{border-color:#a7d6c8;background:rgba(40,165,139,.09);color:#16856f}
+.pay-button-early{min-height:28px !important;padding-inline:8px !important;border:1px solid #66823b !important;background:#c5f36b14 !important;color:var(--mint) !important;font-size:9px !important;white-space:nowrap !important}
+.installment-actions{display:flex;align-items:center;gap:4px}
+.loan-info{margin:8px 0;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:10px;color:var(--muted)}
+.loan-info b{color:var(--soft)}
+.installment-loan-info{margin:10px 0 0;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:10px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.installment-loan-info b{color:var(--soft)}
 .segmented-control{border-color:rgba(57,87,121,.14);background:rgba(255,255,255,.58)}
 .segmented-control button{color:#75869a}
 .segmented-control .selected{background:rgba(255,255,255,.94);color:#2878d8;box-shadow:0 2px 8px #31577b18}
@@ -155,6 +161,7 @@ select,input,textarea{color:#263b52}
 	.section-title h2,.settings-section h2,.chart-panel h2{font-size:17px}
 	.muted-copy{font-size:13px}
 	.primary-button,.outline-button,.pay-button{min-height:44px;padding-inline:14px;font-size:13px}
+\t.pay-button-early{min-height:36px !important;padding-inline:10px !important;font-size:11px !important;white-space:nowrap !important}
 	.transaction-row{min-height:68px;gap:9px}
 	.transaction-main b{font-size:13px}
 	.transaction-main small{font-size:11px}
@@ -254,6 +261,7 @@ html[data-theme="dark"] .status-pill{background:rgba(220,94,88,.14);color:#ffaaa
 html[data-theme="dark"] .status-pill.is-paid{background:rgba(66,177,148,.14);color:#80d7bf}
 html[data-theme="dark"] .installment-numbers{border-color:rgba(200,220,239,.12)}
 html[data-theme="dark"] .pay-button{border-color:rgba(115,196,173,.35);background:rgba(66,177,148,.12);color:#8ee0c8}
+html[data-theme="dark"] .pay-button-early{border-color:rgba(115,196,173,.35) !important;background:rgba(66,177,148,.12) !important;color:#8ee0c8 !important}
 html[data-theme="dark"] .segmented-control{border-color:rgba(197,219,239,.16);background:rgba(23,35,48,.7)}
 html[data-theme="dark"] .segmented-control button{color:#a6b6c7}
 html[data-theme="dark"] .segmented-control .selected{background:rgba(71,91,114,.7);color:#c5ddf7;box-shadow:0 2px 8px rgba(0,0,0,.16)}

@@ -1005,9 +1005,13 @@ function installments() {
                   : legacyPeriodToJalali(row.period) === current),
             );
             const debt = installmentBalance(item);
+            const loanAmount = Number(item.loan_amount || 0);
+            const interestRate = Number(item.interest_rate || 0);
+            const monthly_amount = Number(item.monthly_amount || 0);
             const dueInfo = installmentDueInfo(item, offset);
             const amountDue = installmentDueAmount(item, offset);
-            return `<article class="installment-row"><div class="installment-head"><div><span class="installment-glyph">▤</span><div><h2>${escape(item.name)}</h2><small>${dueInfo.dayLabel}</small></div></div><span class="status-pill ${paidThisMonth ? "is-paid" : ""}">${paidThisMonth ? "پرداخت‌شده این ماه" : isDue ? `سررسید${dueInfo.status ? `<br>${dueInfo.status}` : ""}` : `${number.format(Math.max(0, installmentMonths(item) - offset))} قسط مانده`}</span></div><div class="installment-numbers"><div><small>مبلغ این قسط</small><b>${money(amountDue)}</b></div><div><small>بدهی مانده</small><b>${money(debt)}</b></div><div><small>پرداخت</small><b>${number.format(offset)} از ${number.format(installmentMonths(item))}</b></div></div><div class="installment-footer"><span>سررسید بعدی ${formatJalaliDate(dueDate)}</span>${isDue ? `<button class="pay-button" data-action="pay" data-id="${escape(item.id)}" data-period="${due.key}">☑️ پرداخت شد</button>` : ""}</div></article>`;
+            const canPay = !paidThisMonth && offset < installmentMonths(item) && amountDue > 0;
+            return `<article class="installment-row"><div class="installment-head"><div><span class="installment-glyph">▤</span><div><h2>${escape(item.name)}</h2><small>${dueInfo.dayLabel}</small></div></div><span class="status-pill ${paidThisMonth ? "is-paid" : ""}">${paidThisMonth ? "پرداخت‌شده این ماه" : isDue ? `سررسید${dueInfo.status ? `<br>${dueInfo.status}` : ""}` : `${number.format(Math.max(0, installmentMonths(item) - offset))} قسط مانده`}</span></div><div class="installment-numbers"><div><small>مبلغ این قسط</small><b>${money(amountDue)}</b></div><div><small>بدهی مانده</small><b>${money(debt)}</b></div><div><small>پرداخت</small><b>${number.format(offset)} از ${number.format(installmentMonths(item))}</b></div></div>${loanAmount > 0 ? `<div class="installment-loan-info"><small>وام اصلی: <b>${money(loanAmount)}</b></small><small>سود سالانه: <b>${interestRate}%</b></small><small>کل بازپرداخت: <b>${money(debt + monthly_amount * offset)}</b></small></div>` : ""}<div class="installment-footer"><span>سررسید بعدی ${formatJalaliDate(dueDate)}</span><div class="installment-actions"><button class="text-action" data-action="edit-installment" data-id="${escape(item.id)}">ویرایش</button><button class="row-delete" data-action="delete-installment" data-id="${escape(item.id)}" aria-label="حذف قسط">×</button></div>${canPay ? `<button class="pay-button ${isDue ? "" : "pay-button-early"}" data-action="pay" data-id="${escape(item.id)}" data-period="${due.key}">${isDue ? "☑️ پرداخت شد" : "💳 پرداخت قبل از سررسید"}</button>` : ""}</div></article>`;
           })
           .join("")
       : '<div class="empty-state"><b>قسطی ثبت نشده</b><small>قسط‌ها را اضافه کن تا سررسید ماهانه اینجا نمایش داده شود.</small><button class="outline-button" data-action="installment">افزودن قسط</button></div>'
@@ -1426,10 +1430,16 @@ function transactionForm(kind) {
     `<form data-form="transaction" data-kind="${kind}">${titleField}${amountInput(kind === "salary" ? "مبلغ حقوق واقعی (تومان)" : "مبلغ (تومان)", "amount", amountValue)}${expense ? `<label>دسته‌بندی<select name="category">${state.categories.map((item) => `<option value="${escape(item.name)}">${escape(displayCategory(item.name))}</option>`).join("")}</select></label>` : ""}${jalaliDateInput("تاریخ شمسی", "date", salaryDate)}<label>توضیحات<textarea name="note" rows="2"></textarea></label><button class="primary-button">ذخیره</button></form>`,
   );
 }
-function installmentForm() {
+function installmentForm(item = null) {
+  const isEdit = !!item;
+  const loanAmount = isEdit ? Number(item.loan_amount || 0) : 0;
+  const interestRate = isEdit ? Number(item.interest_rate || 0) : 0;
+  const monthlyAmount = isEdit ? Number(item.monthly_amount || 0) : 0;
+  const totalAmount = isEdit ? Number(item.total_amount || 0) : 0;
+  const isBankLoan = loanAmount > 0;
   modal(
-    "افزودن قسط",
-    `<form data-form="installment">${input("نام قسط", "name")}${amountInput("مبلغ هر ماه (تومان)", "monthly")}${amountInput("مبلغ کل بدهی (تومان)", "total")}${input("تعداد کل ماه‌ها", "months", "number", 'min="1"')}${input("تعداد پرداخت‌شده", "paid", "number", 'min="0"', "0")}${jalaliDateInput("سررسید قسط بعدی", "due", dateNow())}<p class="muted-copy">تعداد پرداخت‌شده را تعداد اقساطی که تا الان دادید وارد کنید؛ سررسید بعدی از ماه بعد آن تعداد حساب می‌شود.</p><button class="primary-button">ثبت قسط</button></form>`,
+    isEdit ? "ویرایش قسط" : "افزودن قسط",
+    `<form data-form="installment" data-id="${isEdit ? escape(item.id) : ""}">${input("نام قسط", "name", "text", 'maxlength="60"', isEdit ? item.name : "")}${isBankLoan ? `<div class="loan-info"><small>مبلغ وام اصلی: <b>${money(loanAmount)}</b></small><small>نرخ سود سالانه: <b>${interestRate}%</b></small><small>مبلغ کل بازپرداخت: <b>${money(totalAmount)}</b></small></div>` : ""}${amountInput("مبلغ هر ماه (تومان)", "monthly", isEdit ? formatAmount(monthlyAmount) : "")}${amountInput("مبلغ وام اصلی (تومان)", "loan_amount", isEdit ? formatAmount(loanAmount) : "")}${input("نرخ سود سالانه (%)", "interest_rate", "number", 'min="0" step="0.01"', isEdit ? interestRate : "")}${input("تعداد کل ماه‌ها", "months", "number", 'min="1"', isEdit ? item.months : "")}${input("تعداد پرداخت‌شده", "paid", "number", 'min="0"', isEdit ? item.paid_count : "")}${jalaliDateInput("سررسید قسط بعدی", "due", isEdit ? (item.next_due_date || item.start_date) : dateNow())}<p class="muted-copy">${isBankLoan ? "مبلغ هر ماه با احتساب سود بانکی محاسبه شده است." : "تعداد پرداخت‌شده را تعداد اقساطی که تا الان دادید وارد کنید؛ سررسید بعدی از ماه بعد آن تعداد حساب می‌شود."}</p><button class="primary-button">${isEdit ? "ذخیره تغییرات" : "ثبت قسط"}</button></form>`,
   );
 }
 function monthEntryForm() {
@@ -1849,20 +1859,10 @@ async function handleForm(form) {
     const dueParts = parseJalaliParts(value.due);
     if (!dueParts)
       return toast("سررسید قسط بعدی معتبر نیست؛ مثل ۱۴۰۵/۱۰/۲ وارد کن.", true);
-    const monthly = Number(value.monthly);
-    const total = Number(value.total);
+    const loanAmount = Number(value.loan_amount || 0);
+    const interestRate = Number(value.interest_rate || 0);
     const months = Number(value.months);
     const paid = Number(value.paid || 0);
-    if (
-      !Number.isSafeInteger(monthly) ||
-      monthly <= 0 ||
-      !Number.isSafeInteger(total) ||
-      total <= 0
-    )
-      return toast(
-        "مبلغ قسط و بدهی باید عدد صحیحِ مثبت و به تومان باشد.",
-        true,
-      );
     if (!Number.isSafeInteger(months) || months < 1)
       return toast("تعداد ماه‌ها باید عدد صحیح و حداقل ۱ باشد.", true);
     if (!Number.isSafeInteger(paid) || paid < 0 || paid > months)
@@ -1870,9 +1870,37 @@ async function handleForm(form) {
         "تعداد پرداخت‌شده باید عدد صحیح و بین صفر و تعداد کل باشد.",
         true,
       );
-    if (!Number.isSafeInteger(monthly * months) || total > monthly * months)
-      return toast("مبلغ کل با مبلغ ماهانه و تعداد ماه‌ها سازگار نیست.", true);
     if (!value.name.trim()) return toast("نام قسط را وارد کن.", true);
+    // Pro 계산 banci loan (annuity formula) when loan_amount and interest_rate provided
+    let monthly = Number(value.monthly);
+    let total = Number(value.total);
+    if (loanAmount > 0) {
+      if (loanAmount <= 0)
+        return toast("مبلغ وام باید عدد مثبت باشد.", true);
+      if (interestRate < 0)
+        return toast("نرخ سود نمی‌تواند منفی باشد.", true);
+      const r = interestRate / 12 / 100;
+      if (r === 0) monthly = loanAmount / months;
+      else {
+        const factor = Math.pow(1 + r, months);
+        monthly = (loanAmount * r * factor) / (factor - 1);
+      }
+      monthly = Math.round(monthly);
+      total = monthly * months;
+    } else {
+      if (
+        !Number.isSafeInteger(monthly) ||
+        monthly <= 0 ||
+        !Number.isSafeInteger(total) ||
+        total <= 0
+      )
+        return toast(
+          "مبلغ قسط و بدهی باید عدد صحیحِ مثبت و به تومان باشد.",
+          true,
+        );
+      if (!Number.isSafeInteger(monthly * months) || total > monthly * months)
+        return toast("مبلغ کل با مبلغ ماهانه و تعداد ماه‌ها سازگار نیست.", true);
+    }
     // start_month is the Jalali month of the NEXT unpaid installment, so the schedule
     // counts every already-paid installment and continues from that one (e.g. paid 8 of 12 -> starts at 9).
     const startParts = addJalaliMonth(
@@ -1884,8 +1912,10 @@ async function handleForm(form) {
       dueParts.jd,
       jalaliMonthLength(startParts.jy, startParts.jm),
     );
+    const isEdit = !!form.dataset.id;
+    const existing = isEdit ? state.installments.find((row) => row.id === form.dataset.id) : null;
     await save("installments", {
-      id: id(),
+      id: existing?.id || id(),
       name: value.name.trim(),
       monthly_amount: monthly,
       total_amount: total,
@@ -1895,20 +1925,22 @@ async function handleForm(form) {
       next_due_date: dueParts.iso,
       due_day: dueParts.jd,
       due_month: `${startParts.jy}-${String(startParts.jm).padStart(2, "0")}-${String(startDay).padStart(2, "0")}`,
+      loan_amount: loanAmount,
+      interest_rate: interestRate,
     });
     await refresh();
-    let savedMessage = "قسط ثبت شد.";
+    let savedMessage = isEdit ? "قسط بروزرسانی شد." : "قسط ثبت شد.";
     if (Capacitor.isNativePlatform() && setting("installmentReminders", true)) {
       try {
         if (await requestInstallmentNotificationPermission())
           await scheduleInstallmentNotifications();
         else {
           await setSetting("installmentReminders", false);
-          savedMessage = "قسط ثبت شد؛ مجوز اعلان داده نشد.";
+          savedMessage = isEdit ? "قسط بروزرسانی شد؛ مجوز اعلان داده نشد." : "قسط ثبت شد؛ مجوز اعلان داده نشد.";
         }
       } catch (error) {
         console.warn("Could not schedule installment reminders.", error);
-        savedMessage = "قسط ثبت شد؛ زمان‌بندی اعلان انجام نشد.";
+        savedMessage = isEdit ? "قسط بروزرسانی شد؛ زمان‌بندی اعلان انجام نشد." : "قسط ثبت شد؛ زمان‌بندی اعلان انجام نشد.";
       }
     }
     state.page = "installments";
@@ -2282,6 +2314,25 @@ root.addEventListener("click", async (event) => {
           }
           render();
           toast("چک حذف شد.");
+        }
+        break;
+      }
+      case "edit-installment":
+        installmentForm(state.installments.find((row) => row.id === key));
+        break;
+      case "delete-installment": {
+        if (confirm(t("این قسط حذف شود؟"))) {
+          await remove("installments", key);
+          await refresh();
+          if (Capacitor.isNativePlatform()) {
+            try {
+              await scheduleInstallmentNotifications();
+            } catch (error) {
+              console.warn("Could not update installment reminders.", error);
+            }
+          }
+          render();
+          toast("قسط حذف شد.");
         }
         break;
       }
