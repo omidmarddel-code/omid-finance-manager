@@ -526,6 +526,107 @@ const translations = {
     "The Home balance equals: income + salary + savings withdrawals minus expenses, paid installments and amounts transferred to savings.",
   "با تغییر ماه شمسی، خودکار ماه جدید آغاز می‌شود و صفحهٔ ثبت حقوق تخمینی پیشنهاد می‌شود.":
     "When the Jalali month changes, a new month starts automatically and the salary estimate page is offered.",
+  "در صفحهٔ اصلی، حقوق تخمینی ماه را برای برنامه‌ریزی ثبت کن. وقتی حقوق واقعاً به حسابت واریز شد، دکمهٔ ثبت حقوق واقعی را بزن. حقوق واقعی جای تخمین همان ماه را می‌گیرد و هر ماه فقط یک رکورد حقوق ثبت می‌شود. با شروع ماه شمسی جدید، ماندهٔ ماه قبل در موجودی می‌ماند و حقوق جدید به آن اضافه می‌شود.":
+    "Set an estimated salary on Home for planning. When your salary is actually paid, use Record actual salary. The actual salary replaces that month’s estimate, and each month keeps one salary record. When a new Jalali month starts, the previous month’s balance carries over and the new salary is added to it.",
+  "سقف بودجهٔ هزینه و هدف پس‌انداز را هم از تنظیمات تعیین کن؛ اگر هزینه‌ها به سقف بودجه برسد، هشدار می‌گیری.":
+    "Set a spending limit and savings goal in Settings. The app warns you when expenses reach the budget limit.",
+  "قسط را با نام، مبلغ ماهانه، مبلغ کل بدهی، تعداد کل ماه‌ها، تعداد اقساط پرداخت‌شده و سررسید بعدی ثبت کن (مثلاً اگر ۸ از ۱۲ قسط را داده‌ای، ۸ را وارد کن؛ برنامه از قسط نهم ادامه می‌دهد). در ماه سررسید، قسط را ثبت کن؛ اگر بخواهی می‌توانی آن را زودتر هم پرداخت کنی.":
+    "Add an installment with its name, monthly amount, total debt, number of months, payments already made and next due date. In the due month, record the payment; you can also pay it early.",
+  "با ثبت پرداخت، مبلغ از موجودی کسر می‌شود و یک قسط تسویه می‌شود. اگر موجودی کافی نباشد، برداشت از پس‌انداز پیشنهاد می‌شود. اقساط عقب‌افتاده در محاسبهٔ بدهی باقی می‌مانند و بدهی کل بالای صفحه دیده می‌شود.":
+    "Recording a payment deducts it from your balance and settles one installment. If the balance is insufficient, the app offers to use savings. Overdue installments remain in the debt total shown at the top.",
+  "چک‌ها را با عنوان، مبلغ و تاریخ سررسید ثبت کن. مبلغ چک فقط برای یادآوری است و در موجودی یا گزارش‌های مالی حساب نمی‌شود. با ثبت چک، اعلان ۷ روز قبل، ۲ روز قبل و روز سررسید برایت زمان‌بندی می‌شود.":
+    "Add a check with its title, amount and due date. Check amounts are only for reminders and are excluded from your balance and financial reports. Reminders are scheduled 7 days before, 2 days before and on the due date.",
+  "وضعیت هر چک، مثل روزهای باقی‌مانده یا سررسید امروز، در فهرست چک‌ها دیده می‌شود.":
+    "Each check’s status, such as days remaining or due today, appears in the check list.",
+  "گزارش ماهانه یا سالانه را انتخاب کن. در گزارش ماهانه، ماندهٔ منتقل‌شده از ماه‌های قبل جداگانه دیده می‌شود؛ مبلغ باقی‌مانده، موجودی پایان دوره را نشان می‌دهد.":
+    "Choose a monthly or yearly report. The monthly report shows the balance carried over from earlier months separately; the remaining amount is the closing balance.",
+  "درآمد، حقوق، هزینه، اقساط پرداخت‌شده و دسته‌بندی هزینه‌ها را هم بررسی کن و در صورت نیاز گزارش را PDF بگیر.":
+    "Review income, salary, expenses, installments paid and spending categories, and export the report as a PDF if needed.",
+  "از کارت پس‌انداز صفحهٔ اصلی، هر بار مبلغ دلخواهی از موجودی در دسترس را به پس‌انداز منتقل کن. در طول ماه می‌توانی چند بار انتقال انجام بدهی؛ هر مبلغ منتقل‌شده از موجودی کم و به پس‌انداز اضافه می‌شود. مبلغ هر انتقال نمی‌تواند از موجودی قابل‌انتقال بیشتر باشد.":
+    "From the Savings card on Home, transfer any amount up to your available balance. You can make several transfers during the month; each transfer reduces your balance and adds to savings.",
+  "اگر هنگام ثبت هزینه یا پرداخت قسط موجودی کافی نباشد، برنامه با تأیید تو برداشت از پس‌انداز را پیشنهاد می‌کند.":
+    "If your balance is insufficient for an expense or installment, the app offers to withdraw from savings with your confirmation.",
+  "اعلان قسط در ساعت ۹ صبح روز سررسید می‌آید. برای چک‌ها، اعلان ۷ روز قبل، ۲ روز قبل و روز سررسید زمان‌بندی می‌شود. یادآوری ثبت هزینه هم روزی سه بار، ساعت ۹ صبح، ۳ بعدازظهر و ۹ شب می‌آید.":
+    "Installment reminders arrive at 9 AM on the due date. Check reminders are scheduled 7 days before, 2 days before and on the due date. Expense reminders arrive three times a day: 9 AM, 3 PM and 9 PM.",
+  "این اعلان‌ها روی دستگاه تنظیم می‌شوند و برای دریافتشان باید مجوز اعلان برنامه فعال باشد.":
+    "These notifications are scheduled on your device. Notification permission must be enabled to receive them.",
+  "یادآوری قسط و ثبت هزینه را از تنظیمات روشن یا خاموش کن. برای دریافت اعلان‌ها، مجوز اعلان برنامه باید فعال باشد.":
+    "Turn installment and expense reminders on or off in Settings. App notification permission must be enabled to receive alerts.",
+  "موجودی صفحهٔ اصلی، ماندهٔ ماه‌های قبل را به‌علاوهٔ درآمد و حقوق می‌گیرد و هزینه، اقساط پرداخت‌شده و انتقال به پس‌انداز را از آن کم می‌کند.":
+    "The Home balance includes the amount carried over from previous months, plus income and salary, minus expenses, paid installments and transfers to savings.",
+  "با شروع ماه شمسی جدید، ماندهٔ ماه قبل حفظ می‌شود؛ حقوق ماه جدید را جداگانه ثبت کن تا به موجودی اضافه شود.":
+    "When a new Jalali month starts, the previous balance is kept. Record the new month’s salary separately to add it to your balance.",
+  "برای اعلان اقساط، چک‌ها و یادآوری روزانهٔ ثبت هزینه، مجوز اعلان برنامه را فعال کن.":
+    "Enable app notifications to receive installment and check reminders and daily expense prompts.",
+  "پشتیبانی": "Support",
+  "پرسش یا پیشنهادی داری؟ پیام بده.": "Have a question or suggestion? Get in touch.",
+  "راه‌های ارتباط": "Contact options",
+  "موجودی پس‌انداز و انتقال‌های ثبت‌شده": "Savings balance and recorded transfers",
+  "انتقال به پس‌انداز": "Transfer to savings",
+  "موجودی قابل انتقال این ماه": "Available balance to transfer this month",
+  "بودجه خرج": "Spending budget",
+  "بودجهٔ تعیین‌شده": "Set budget",
+  "تعیین نشده": "Not set",
+  "سوابق برنامه": "App history",
+  "فعالیت‌های کاربر": "Activity history",
+  "پاک‌کردن گزارش‌ها": "Clear activity history",
+  "هنوز فعالیتی ثبت نشده است.": "No activity recorded yet.",
+  "گزارش فعالیت‌ها پاک شد.": "Activity history cleared.",
+  "گزارش فعالیت‌ها پاک شود؟ اطلاعات مالی برنامه حذف نمی‌شود.":
+    "Clear activity history? Your financial data will not be deleted.",
+  "هزینه‌ای ثبت نشده": "No expenses recorded",
+  "برای شروع، یک هزینه ثبت کن.": "Add an expense to get started.",
+  "گزارش بودجهٔ": "Budget report: ",
+  "بودجهٔ ": "Budget for ",
+  "خرج‌شده در ": "Spent in ",
+  "ماندهٔ بودجهٔ ": "Remaining budget for ",
+  "تماس تلفنی با ": "Call ",
+  "ارتباط از طریق تلگرام": "Contact via Telegram",
+  "ارتباط از طریق واتساپ": "Contact via WhatsApp",
+  "تلفن": "Phone",
+  "تلگرام": "Telegram",
+  "واتساپ": "WhatsApp",
+  "امید مرددل، سازندهٔ برنامه": "Omid Marddel, app creator",
+  "تماس تلفنی با امید مرددل": "Call Omid Marddel",
+  "بودجهٔ آذر ۱۴۰۵؛ عبور از سقف با رنگ قرمز مشخص می‌شود.":
+    "Set the budget for this month. Exceeding the limit is marked in red.",
+  "؛ عبور از سقف با رنگ قرمز مشخص می‌شود.":
+    "; exceeding the limit is marked in red.",
+  "دستهٔ هزینه اضافه شد: ": "Expense category added: ",
+  "چک ثبت شد: ": "Check added: ",
+  "چک ویرایش شد: ": "Check updated: ",
+  "چک حذف شد: ": "Check deleted: ",
+  "قسط ثبت شد: ": "Installment added: ",
+  "قسط ویرایش شد: ": "Installment updated: ",
+  "قسط حذف شد: ": "Installment deleted: ",
+  "قسط پرداخت شد: ": "Installment paid: ",
+  "هزینه حذف شد: ": "Expense deleted: ",
+  "درآمد حذف شد: ": "Income deleted: ",
+  "هزینه ثبت شد: ": "Expense recorded: ",
+  "درآمد ثبت شد: ": "Income recorded: ",
+  " · با برداشت از پس‌انداز": " · savings used",
+  "حقوق ماهانه ثبت شد": "Monthly salary recorded",
+  "حقوق ماهانه ویرایش شد": "Monthly salary updated",
+  "حقوق تخمینی ماه ثبت شد": "Monthly salary estimate recorded",
+  "بودجه و هدف پس‌انداز ماهانه تنظیم شد": "Monthly budget and savings goal updated",
+  "رمز ورود برنامه تنظیم شد": "App PIN set",
+  "رمز ورود برنامه تغییر کرد": "App PIN changed",
+  "اندازهٔ نوشتهٔ برنامه تغییر کرد": "Text size changed",
+  "زبان برنامه به انگلیسی تغییر کرد": "App language changed to English",
+  "زبان برنامه به فارسی تغییر کرد": "App language changed to Persian",
+  "پوستهٔ تیره فعال شد": "Dark theme enabled",
+  "پوستهٔ روشن فعال شد": "Light theme enabled",
+  "مدت قفل خودکار تغییر کرد": "Auto-lock duration changed",
+  "ورود بیومتریک فعال شد": "Biometric sign-in enabled",
+  "ورود بیومتریک غیرفعال شد": "Biometric sign-in disabled",
+  "محل ذخیرهٔ نسخهٔ پشتیبان تغییر کرد": "Backup location changed",
+  "یادآوری سررسید قسط فعال شد": "Installment reminders enabled",
+  "یادآوری سررسید قسط غیرفعال شد": "Installment reminders disabled",
+  "یادآوری ثبت هزینه فعال شد": "Expense reminders enabled",
+  "یادآوری ثبت هزینه غیرفعال شد": "Expense reminders disabled",
+  "انتقال موجودی به پس‌انداز": "Transfer balance to savings",
+  "اطلاعات برنامه بازنشانی شد": "App data reset",
+  "اطلاعات از نسخهٔ پشتیبان بازیابی شد": "Data restored from backup",
 };
 
 let currentLanguage = "fa";
@@ -565,6 +666,26 @@ const mixedPhrases = [
   ],
   [" از ", " of "],
   ["هزینه‌ها ", "Expenses "],
+  ["بودجه خرج · ", "Spending budget · "],
+  ["گزارش بودجهٔ ", "Budget report: "],
+  ["خرج‌شده در ", "Spent in "],
+  ["ماندهٔ بودجهٔ ", "Remaining budget for "],
+  ["بودجهٔ ", "Budget for "],
+  ["هزینه ثبت شد: ", "Expense recorded: "],
+  ["درآمد ثبت شد: ", "Income recorded: "],
+  ["هزینه حذف شد: ", "Expense deleted: "],
+  ["درآمد حذف شد: ", "Income deleted: "],
+  ["چک ثبت شد: ", "Check added: "],
+  ["چک ویرایش شد: ", "Check updated: "],
+  ["چک حذف شد: ", "Check deleted: "],
+  ["قسط ثبت شد: ", "Installment added: "],
+  ["قسط ویرایش شد: ", "Installment updated: "],
+  ["قسط حذف شد: ", "Installment deleted: "],
+  ["قسط پرداخت شد: ", "Installment paid: "],
+  [" · با برداشت از پس‌انداز", " · savings used"],
+  ["دستهٔ هزینه اضافه شد: ", "Expense category added: "],
+  [" ویرایش شد", " updated"],
+  [" ثبت شد", " saved"],
 ];
 
 export function setLanguage(language) {
@@ -618,10 +739,14 @@ export function localizeDOM(root) {
   root
     .querySelectorAll("[placeholder],[title],[aria-label]")
     .forEach((element) => {
-      for (const attribute of ["placeholder", "title", "aria-label"]) {
+      for (const attribute of ["placeholder", "title", "aria-label", "alt"]) {
         const value = element.getAttribute(attribute);
-        if (value && translations[value])
-          element.setAttribute(attribute, translations[value]);
+        if (!value) continue;
+        const translated = translations[value] || mixedPhrases.reduce(
+          (text, [fa, en]) => text.replaceAll(fa, en),
+          value,
+        );
+        if (translated !== value) element.setAttribute(attribute, translated);
       }
     });
 }

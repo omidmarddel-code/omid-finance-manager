@@ -11,7 +11,8 @@ const stores = {
   category_budgets: { key: 'id', fields: ['id', 'category_id', 'month', 'amount'] },
   savings_transfers: { key: 'period', fields: ['period', 'amount', 'created_at'] },
   savings_movements: { key: 'id', fields: ['id', 'kind', 'amount', 'date', 'note', 'transaction_id', 'payment_id'] },
-  checks: { key: 'id', fields: ['id', 'title', 'amount', 'due_date', 'created_at'] }
+  checks: { key: 'id', fields: ['id', 'title', 'amount', 'due_date', 'created_at'] },
+  activities: { key: 'id', fields: ['id', 'description', 'amount', 'created_at'] }
 };
 
 const schema = `
@@ -25,6 +26,7 @@ const schema = `
   CREATE TABLE IF NOT EXISTS savings_transfers (period TEXT PRIMARY KEY, amount REAL NOT NULL, created_at TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS savings_movements (id TEXT PRIMARY KEY, kind TEXT NOT NULL, amount REAL NOT NULL, date TEXT NOT NULL, note TEXT, transaction_id TEXT, payment_id TEXT);
   CREATE TABLE IF NOT EXISTS checks (id TEXT PRIMARY KEY, title TEXT NOT NULL, amount REAL NOT NULL, due_date TEXT NOT NULL, created_at TEXT NOT NULL);
+  CREATE TABLE IF NOT EXISTS activities (id TEXT PRIMARY KEY, description TEXT NOT NULL, amount REAL NOT NULL DEFAULT 0, created_at TEXT NOT NULL);
   CREATE INDEX IF NOT EXISTS transactions_date_idx ON transactions(date);
   CREATE INDEX IF NOT EXISTS payments_period_idx ON payments(period);
 `;
@@ -36,7 +38,7 @@ let native = false;
 
 function openBrowserDatabase() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('hamrah-finance', 5);
+    const request = indexedDB.open('hamrah-finance', 6);
     request.onupgradeneeded = () => {
       const db = request.result;
       Object.entries(stores).forEach(([name, definition]) => {

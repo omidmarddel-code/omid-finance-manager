@@ -40,6 +40,16 @@ async function remove(storeName, key) {
   await dbRemove(storeName, key);
   scheduleAutoBackup();
 }
+async function recordActivity(description, amount = 0) {
+  const activity = {
+    id: id(),
+    description,
+    amount: Number(amount) || 0,
+    created_at: new Date().toISOString(),
+  };
+  await save("activities", activity);
+  state.activities.unshift(activity);
+}
 const number = {
   format: (amount, options) =>
     new Intl.NumberFormat(
@@ -141,10 +151,10 @@ export const state = {
   categoryBudgets: [],
   savingsTransfers: [],
   savingsMovements: [],
+  activities: [],
   pendingMonthEntry: false,
   monthPromptShown: false,
   monthCycle: monthNow(),
-  search: "",
   filter: "all",
   report: monthNow(),
   reportType: "month",
@@ -196,6 +206,13 @@ async function setSetting(key, value) {
   state.settings[key] = stored;
   await save("settings", { key, value: stored });
 }
+async function persistBackupMetadata(record) {
+  state.lastBackup = record;
+  if (!setting("backupAutoSave", true)) return;
+  const value = JSON.stringify(record);
+  state.settings.lastBackup = value;
+  await dbSave("settings", { key: "lastBackup", value });
+}
 async function applyStatusBarTheme(theme) {
   if (!Capacitor.isNativePlatform()) return;
   try {
@@ -233,6 +250,7 @@ async function refresh() {
     categoryBudgets,
     savingsTransfers,
     savingsMovements,
+    activities,
   ] = await Promise.all(
     [
       "transactions",
@@ -245,6 +263,7 @@ async function refresh() {
       "category_budgets",
       "savings_transfers",
       "savings_movements",
+      "activities",
     ].map(all),
   );
   const recordedPayments = new Map();
@@ -307,7 +326,9 @@ async function refresh() {
     categoryBudgets,
     savingsTransfers,
     savingsMovements,
+    activities,
   });
+  state.lastBackup = setting("lastBackup", state.lastBackup || null);
   scheduleAutoBackup();
 }
 export function savingsBalance() {
@@ -326,7 +347,7 @@ export function savingsBalance() {
 export function confirmSavingsFunding(amount, month) {
   const deficit = Math.max(
     0,
-    Number(amount) - Math.max(0, monthData(month).rawRemaining),
+    Number(amount) - Math.max(0, monthData(month).remaining),
   );
   if (!deficit) return 0;
   const savings = savingsBalance();
@@ -400,7 +421,7 @@ function salaryEstimateFor(month) {
     return +setting("monthlySalary", 0) || 0;
   return 0;
 }
-export function monthData(month) {
+function monthFlowData(month) {
   const rows = state.transactions.filter(
     (row) => isoToJalaliKey(row.date) === month,
   );
@@ -433,6 +454,11 @@ export function monthData(month) {
       (row) => row.kind === "withdrawal" && isoToJalaliKey(row.date) === month,
     )
     .reduce((sum, row) => sum + Number(row.amount || 0), 0);
+  const savingsDeposits = state.savingsMovements
+    .filter(
+      (row) => row.kind === "deposit" && isoToJalaliKey(row.date) === month,
+    )
+    .reduce((sum, row) => sum + Number(row.amount || 0), 0);
   const due = state.installments.reduce((sum, item) => {
     for (let offset = 0; offset < installmentMonths(item); offset++) {
       // Match obligations and financial reports by the same Jalali month key.
@@ -443,7 +469,7 @@ export function monthData(month) {
     return sum;
   }, 0);
   const rawRemaining =
-    salary + income + savingsWithdrawals - expense - paid - savingsTransferred;
+    salary + income + savingsWithdrawals - expense - paid - savingsTransferred - savingsDeposits;
   return {
     rows,
     expenses,
@@ -455,12 +481,39 @@ export function monthData(month) {
     expense,
     paid,
     savingsTransferred,
+    savingsDeposits,
     savingsWithdrawals,
     due,
     rawRemaining,
-    remaining: rawRemaining,
     payments,
   };
+}
+
+function firstFinancialMonth() {
+  const months = [
+    ...state.transactions.map((row) => isoToJalaliKey(row.date)),
+    ...state.payments.map((row) => row.paid_at ? isoToJalaliKey(row.paid_at) : legacyPeriodToJalali(row.period)),
+    ...state.savingsMovements.map((row) => isoToJalaliKey(row.date)),
+    ...state.savingsTransfers.map((row) => legacyPeriodToJalali(row.period)),
+    ...Object.keys(state.settings).flatMap((key) => {
+      const match = key.match(/^salaryEstimate:(\d{4}-\d{2})$/);
+      return match ? [legacyPeriodToJalali(match[1])] : [];
+    }),
+  ].filter((value) => /^\d{4}-\d{2}$/.test(value));
+  return months.length ? months.sort()[0] : monthNow();
+}
+
+export function monthData(month) {
+  const openingBalance = month <= firstFinancialMonth()
+    ? 0
+    : (() => {
+        let balance = 0;
+        for (let cursor = firstFinancialMonth(); cursor < month; cursor = addMonth(cursor, 1))
+          balance += monthFlowData(cursor).rawRemaining;
+        return balance;
+      })();
+  const flow = monthFlowData(month);
+  return { ...flow, openingBalance, remaining: openingBalance + flow.rawRemaining };
 }
 
 /**
@@ -492,6 +545,7 @@ function yearData(year) {
     (_, index) => `${year}-${String(index + 1).padStart(2, "0")}`,
   ).map(monthData);
   const rawRemaining = months.reduce((sum, row) => sum + row.rawRemaining, 0);
+  const openingBalance = months[0].openingBalance;
   return {
     rows: months.flatMap((row) => row.rows),
     expenses: months.flatMap((row) => row.expenses),
@@ -505,7 +559,8 @@ function yearData(year) {
     ),
     due: months.reduce((sum, row) => sum + row.due, 0),
     rawRemaining,
-    remaining: rawRemaining,
+    openingBalance,
+    remaining: openingBalance + rawRemaining,
   };
 }
 async function closePreviousMonths() {
@@ -513,26 +568,27 @@ async function closePreviousMonths() {
   // انتقال فقط با دستور دستی کاربر انجام می‌گیرد.
   return;
 }
-async function transferRemainingToSavings(month = monthNow()) {
-  if (
-    state.savingsTransfers.some(
-      (transfer) => legacyPeriodToJalali(transfer.period) === month,
-    )
-  ) {
-    toast("مازاد این ماه قبلاً به پس‌انداز منتقل شده است.", true);
+async function transferToSavings(amount) {
+  const available = Math.max(0, monthData(monthNow()).remaining);
+  if (!Number.isSafeInteger(amount) || amount <= 0) {
+    toast("مبلغ انتقال باید عدد صحیحِ مثبت و به تومان باشد.", true);
     return;
   }
-  const surplus = monthData(month).rawRemaining;
-  if (surplus <= 0) {
-    toast("مازادی برای انتقال به پس‌انداز وجود ندارد.", true);
+  if (amount > available) {
+    toast("مبلغ انتقال از موجودی قابل‌انتقال بیشتر است.", true);
     return;
   }
-  const transfer = { period: month, amount: surplus, created_at: dateNow() };
-  await save("savings_transfers", transfer);
-  state.savingsTransfers.push(transfer);
+  await save("savings_movements", {
+    id: id(),
+    kind: "deposit",
+    amount,
+    date: dateNow(),
+    note: "انتقال از موجودی به پس‌انداز",
+  });
+  await recordActivity("انتقال به پس‌انداز", amount);
   await refresh();
   render();
-  toast("مازاد ماه به پس‌انداز منتقل شد.");
+  toast("مبلغ انتخابی به پس‌انداز منتقل شد.");
 }
 async function prepareCurrentMonth() {
   const current = monthNow();
@@ -594,7 +650,9 @@ async function scheduleExpenseLogReminders() {
   }
   await cancelExpenseLogReminders();
   const now = new Date();
-  const notifications = [9, 21].map((hour) => {
+  // Keep one repeating notification at each of three fixed daily times.
+  // Stable IDs plus cancellation above prevent duplicate alarms on reschedule.
+  const notifications = [9, 15, 21].map((hour) => {
     const at = new Date(now);
     at.setHours(hour, 0, 0, 0);
     if (at <= now) at.setDate(at.getDate() + 1);
@@ -630,20 +688,30 @@ async function scheduleCheckNotifications() {
   const now = new Date();
   const notifications = [];
   for (const check of state.checks) {
-    for (const daysBefore of [7, 2]) {
+    for (const daysBefore of [7, 2, 0]) {
       const at = new Date(`${check.due_date}T09:00:00`);
       at.setDate(at.getDate() - daysBefore);
-      if (at <= now) continue;
+      if (at <= now) {
+        // If the check is entered on its due date after 9 AM, still remind
+        // once that evening instead of silently dropping the due-date alert.
+        if (daysBefore !== 0 || check.due_date !== dateNow()) continue;
+        at.setHours(21, 0, 0, 0);
+        if (at <= now) continue;
+      }
       notifications.push({
         id: installmentNotificationId(`check:${check.id}`, String(daysBefore)),
         title:
-          getLanguage() === "en"
-            ? "Check payment reminder"
-            : "یادآوری پرداخت چک",
+          daysBefore === 0
+            ? getLanguage() === "en" ? "Check due today" : "یادآوری سررسید چک"
+            : getLanguage() === "en" ? "Check payment reminder" : "یادآوری پرداخت چک",
         body:
           getLanguage() === "en"
-            ? `“${check.title}” for ${money(check.amount)} is due in ${daysBefore} days (${formatJalaliDate(check.due_date)}).`
-            : `چک «${check.title}» به مبلغ ${money(check.amount)} تا ${daysBefore} روز دیگر، در تاریخ ${formatJalaliDate(check.due_date)} سررسید می‌شود.`,
+            ? daysBefore === 0
+              ? `“${check.title}” for ${money(check.amount)} is due today (${formatJalaliDate(check.due_date)}).`
+              : `“${check.title}” for ${money(check.amount)} is due in ${daysBefore} days (${formatJalaliDate(check.due_date)}).`
+            : daysBefore === 0
+              ? `چک «${check.title}» به مبلغ ${money(check.amount)} امروز، در تاریخ ${formatJalaliDate(check.due_date)} سررسید می‌شود.`
+              : `چک «${check.title}» به مبلغ ${money(check.amount)} تا ${daysBefore} روز دیگر، در تاریخ ${formatJalaliDate(check.due_date)} سررسید می‌شود.`,
         schedule: { at, allowWhileIdle: true },
         isExactNotification: false,
         extra: { kind: "check-reminder", checkId: check.id, daysBefore },
@@ -954,11 +1022,6 @@ function expenses() {
   const rows = state.transactions
     .filter((item) => item.kind === "expense")
     .filter((item) => state.filter === "all" || item.category === state.filter)
-    .filter((item) =>
-      `${item.title} ${item.category} ${item.note}`
-        .toLowerCase()
-        .includes(state.search.toLowerCase()),
-    )
     .sort((a, b) => b.date.localeCompare(a.date));
 
   // Category budget summary for current month
@@ -971,12 +1034,21 @@ function expenses() {
       const spent = categorySpending[cat.id] || 0;
       const budget = getCategoryBudget(cat.id, current);
       const exceeded = budget > 0 && spent > budget;
-      const percent = budget ? Math.min(100, (spent / budget) * 100) : 0;
-      return `<div class="category-budget-row${exceeded ? ' exceeded' : ''}"><span class="category-budget-name">${escape(displayCategory(cat.name))}</span><div class="category-budget-bar"><div class="category-budget-fill${exceeded ? ' exceeded' : ''}" style="width:${percent}%"></div></div><span class="category-budget-amount">${money(spent)}${budget ? ` / ${money(budget)}` : ''}</span>${budget ? `<button class="text-action" data-action="edit-category-budget" data-id="${escape(cat.id)}">✎</button>` : `<button class="text-action" data-action="add-category-budget" data-id="${escape(cat.id)}">＋</button>`}</div>`;
+      const remainingPercent = budget
+        ? Math.max(0, Math.min(100, ((budget - spent) / budget) * 100))
+        : 0;
+      const status = !budget
+        ? ""
+        : remainingPercent <= 20
+          ? " critical"
+          : remainingPercent <= 40
+            ? " warning"
+            : " healthy";
+      return `<div class="category-budget-row${exceeded ? ' exceeded' : ''}"><button type="button" class="category-budget-name" data-action="category-budget-details" data-id="${escape(cat.id)}">${escape(displayCategory(cat.name))}</button><div class="category-budget-bar${status}" role="progressbar" aria-label="ماندهٔ بودجهٔ ${escape(displayCategory(cat.name))}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(remainingPercent)}"><div class="category-budget-fill${status}" style="width:${remainingPercent}%"></div></div>${budget ? `<button class="text-action" data-action="edit-category-budget" data-id="${escape(cat.id)}">✎</button>` : `<button class="text-action" data-action="add-category-budget" data-id="${escape(cat.id)}">＋</button>`}</div>`;
     })
     .join("");
 
-  return `${pageHeading("هزینه‌ها", "ثبت و بررسی خرج‌کرد")}<section class="list-toolbar"><label class="search-field">⌕ <input id="search" value="${escape(state.search)}" placeholder="جست‌وجوی هزینه..." /></label><select id="categoryFilter"><option value="all">همه دسته‌ها</option>${state.categories.map((item) => `<option value="${escape(item.name)}" ${item.name === state.filter ? "selected" : ""}>${escape(displayCategory(item.name))}</option>`).join("")}</select><button class="primary-button" data-action="expense">＋ ثبت هزینه</button></section>${categoryBudgetRows ? `<section class="category-budget-summary"><h2>بودجه دسته‌ای-${monthName(current)}</h2><div class="category-budget-list">${categoryBudgetRows}</div></section>` : ""}<section class="list-summary"><span>جمع نتایج</span><strong>${money(rows.reduce((sum, row) => sum + +row.amount, 0))}</strong><small>${number.format(rows.length)} تراکنش</small></section><section class="section-block">${rows.length ? transactionRows(rows, true) : '<div class="empty-state"><b>هزینه‌ای پیدا نشد</b><small>فیلتر را تغییر بده یا هزینه‌ای ثبت کن.</small></div>'}</section>`;
+  return `${pageHeading("هزینه‌ها", "ثبت و بررسی خرج‌کرد")}<section class="list-toolbar"><select id="categoryFilter"><option value="all">همه دسته‌ها</option>${state.categories.map((item) => `<option value="${escape(item.name)}" ${item.name === state.filter ? "selected" : ""}>${escape(displayCategory(item.name))}</option>`).join("")}</select><button class="primary-button" data-action="expense">＋ ثبت هزینه</button></section>${categoryBudgetRows ? `<section class="category-budget-summary"><h2>بودجه خرج · ${monthName(current)}</h2><div class="category-budget-list">${categoryBudgetRows}</div></section>` : ""}<section class="list-summary"><span>جمع هزینه‌ها</span><strong>${money(rows.reduce((sum, row) => sum + +row.amount, 0))}</strong><small>${number.format(rows.length)} تراکنش</small></section><section class="section-block">${rows.length ? transactionRows(rows, true) : '<div class="empty-state"><b>هزینه‌ای ثبت نشده</b><small>برای شروع، یک هزینه ثبت کن.</small></div>'}</section>`;
 }
 function themePanel() {
   const selectedTheme = setting("theme", "light");
@@ -994,7 +1066,7 @@ function themePanel() {
 }
 function installmentReminderPanel() {
   if (!Capacitor.isNativePlatform()) return "";
-  return `<section class="settings-section"><p class="eyebrow">اعلان‌های محلی</p><h2>یادآوری‌ها</h2><label class="toggle-row"><span>اعلان روز سررسید قسط<small>ساعت ۹ صبح، بدون نیاز به اینترنت</small></span><input type="checkbox" id="installmentReminderToggle" ${setting("installmentReminders", true) ? "checked" : ""} /></label><label class="toggle-row"><span>یادآوری ثبت هزینه<small>هر روز ساعت ۹ صبح و ۹ شب</small></span><input type="checkbox" id="expenseLogReminderToggle" ${setting("expenseLogReminders", true) ? "checked" : ""} /></label></section>`;
+  return `<section class="settings-section"><p class="eyebrow">اعلان‌های محلی</p><h2>یادآوری‌ها</h2><label class="toggle-row"><span>اعلان روز سررسید قسط<small>ساعت ۹ صبح، بدون نیاز به اینترنت</small></span><input type="checkbox" id="installmentReminderToggle" ${setting("installmentReminders", true) ? "checked" : ""} /></label><label class="toggle-row"><span>یادآوری ثبت هزینه<small>هر روز ساعت ۹ صبح، ۳ بعدازظهر و ۹ شب</small></span><input type="checkbox" id="expenseLogReminderToggle" ${setting("expenseLogReminders", true) ? "checked" : ""} /></label></section>`;
 }
 function savingsSummary() {
   const total = savingsBalance();
@@ -1006,7 +1078,7 @@ function savingsSummary() {
       ),
     )[0];
   const currentRemaining = monthData(monthNow()).remaining;
-  return `<section class="section-block savings-summary"><div><p class="eyebrow">پس‌انداز</p><h2>پس‌انداز</h2><small class="muted-copy">${latest ? `آخرین انتقال: ${monthName(legacyPeriodToJalali(latest.period))}` : "هنوز انتقالی به پس‌انداز ثبت نشده است."}</small>${currentRemaining > 0 ? `<button class="outline-button" data-action="savings-transfer" style="margin-top:8px;">انتقال مازاد (${money(currentRemaining)})</button>` : ""}</div><strong class="${total < 0 ? "negative-text" : "positive-text"} savings-total">${money(total)}</strong></section>`;
+  return `<section class="section-block savings-summary"><div><p class="eyebrow">پس‌انداز</p><h2>پس‌انداز</h2><small class="muted-copy">${latest ? `آخرین انتقال: ${monthName(legacyPeriodToJalali(latest.period))}` : "موجودی پس‌انداز و انتقال‌های ثبت‌شده"}</small>${currentRemaining > 0 ? `<button class="outline-button" data-action="savings-transfer" style="margin-top:8px;">انتقال موجودی به پس‌انداز</button>` : ""}</div><strong class="${total < 0 ? "negative-text" : "positive-text"} savings-total">${money(total)}</strong></section>`;
 }
 function installmentDueInfo(item, offset) {
   const at = dueDateForOffset(item, offset || 0);
@@ -1089,7 +1161,18 @@ function categoryBudgetForm(item = null) {
 
   modal(
     isEdit ? "ویرایش بودجه دسته" : "تنظیم بودجه دسته",
-    `<form data-form="category_budget" data-id="${escape(budgetId)}" data-category-id="${escape(categoryId)}">${input("دسته", "category_name", "text", 'maxlength="60" readonly', categoryName)}${amountInput("مبلغ بودجه (تومان)", "amount", budgetAmount)}<p class="muted-copy">بودجه برای ماه ${monthName(current)} تعریف می‌شود. اگر هزینهٔ این دسته از سقف بودجه گذشته باشد، نام دسته قرمز نمایش داده می‌شود.</p><button class="primary-button">${isEdit ? "ذخیره تغییرات" : "ثبت بودجه"}</button></form>`,
+    `<form data-form="category_budget" data-id="${escape(budgetId)}" data-category-id="${escape(categoryId)}">${input("دسته", "category_name", "text", 'maxlength="60" readonly', categoryName)}${amountInput("مبلغ بودجه (تومان)", "amount", budgetAmount)}<p class="muted-copy">بودجهٔ ${monthName(current)}؛ عبور از سقف با رنگ قرمز مشخص می‌شود.</p><button class="primary-button">${isEdit ? "ذخیره تغییرات" : "ثبت بودجه"}</button></form>`,
+  );
+}
+function categoryBudgetReport(categoryId) {
+  const category = state.categories.find((item) => item.id === categoryId);
+  if (!category) return;
+  const current = monthNow();
+  const budget = getCategoryBudget(categoryId, current);
+  const spent = getCategorySpending(category.name, current);
+  modal(
+    `گزارش بودجهٔ ${escape(displayCategory(category.name))}`,
+    `<div class="category-budget-report"><div><span>بودجهٔ تعیین‌شده</span><strong>${budget ? money(budget) : "تعیین نشده"}</strong></div><div><span>خرج‌شده در ${monthName(current)}</span><strong class="${spent > budget && budget ? "negative-text" : ""}">${money(spent)}</strong></div></div>`,
   );
 }
 function checks() {
@@ -1189,8 +1272,32 @@ function reports() {
       : `<p class="muted-copy donut-empty">${t("داده‌ای برای نمایش سری وجود ندارد.")}<br><small>${t("بازه:")} ${reportKey} · ${t("تعداد تراکنش در این بازه:")} ${number.format(data.rows.length)}</small></p>`;
   const chart = `<div class="chart-block">${donut}</div>`;
   const flowTable = `<table class="flow-table"><thead><tr><th>${t("ماه")}</th><th>${t("درآمد")}</th><th>${t("هزینه")}</th><th>${t("قسط")}</th></tr></thead><tbody>${flow.map((row, index) => `<tr><td>${monthLabels[index]}</td><td>${money(row.salary + row.income)}</td><td>${money(row.expense)}</td><td>${money(row.paid)}</td></tr>`).join("")}</tbody></table>`;
+  const activityRows = state.activities
+    .slice()
+    .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+    .map((activity) => {
+      const parsedDate = new Date(activity.created_at || Date.now());
+      const createdAt = Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+      const date = formatJalaliDate(localDateKey(createdAt));
+      let description = activity.description || "";
+      if (getLanguage() === "en") {
+        for (const category of state.categories) {
+          const englishCategory = displayCategory(category.name);
+          if (englishCategory !== category.name)
+            description = description.replaceAll(category.name, englishCategory);
+        }
+      }
+      const time = new Intl.DateTimeFormat(
+        getLanguage() === "en" ? "en-US" : "fa-IR",
+        { hour: "2-digit", minute: "2-digit" },
+      ).format(createdAt);
+      return `<article class="activity-log-row"><div><b>${escape(t(description))}</b><small>${date} · ${time}</small></div>${Number(activity.amount) > 0 ? `<strong>${money(activity.amount)}</strong>` : ""}</article>`;
+    })
+    .join("");
+  const activityLog = `<section class="activity-log-panel"><header><div><p class="eyebrow">${t("سوابق برنامه")}</p><h2>${t("فعالیت‌های کاربر")}</h2></div><button class="danger-button" data-action="clear-activities" ${state.activities.length ? "" : "disabled"}>${t("پاک‌کردن گزارش‌ها")}</button></header><div class="activity-log-list">${activityRows || `<p class="muted-copy activity-log-empty">${t("هنوز فعالیتی ثبت نشده است.")}</p>`}</div></section>`;
 
   return `${pageHeading("گزارش‌ها", "تصویر روشن‌تر از جریان پول")}<section class="report-toolbar"><div class="segmented-control"><button data-mode="month" class="${state.reportType === "month" ? "selected" : ""}">ماهانه</button><button data-mode="year" class="${state.reportType === "year" ? "selected" : ""}">سالانه</button></div><button class="icon-button" data-action="report-prev">‹</button><strong>${state.reportType === "month" ? monthName(reportMonth) : number.format(+state.report.slice(0, 4))}</strong><button class="icon-button" data-action="report-next">›</button><button class="outline-button" data-action="pdf">PDF</button></section><section class="report-metrics">${[
+    ["مانده از ماه‌های قبل", data.openingBalance || 0],
     ["درآمد کل", data.salary + data.income],
     ["حقوق دریافتی", data.salary],
     ["سایر درآمدها", data.income],
@@ -1225,7 +1332,7 @@ function reports() {
           `<div class="detail-row"><span>${escape(displayCategory(name))}</span><b>${money(value)}</b><small>${number.format(data.expense ? Math.round((value / data.expense) * 100) : 0)}٪</small></div>`,
       )
       .join("") || '<p class="muted-copy">داده‌ای برای نمایش نیست.</p>'
-  }</article></section>${state.reportType === "month" ? `<section class="comparison-panel"><div><p class="eyebrow">مقایسه با ماه قبل</p><h2>هزینه‌ها ${data.expense > prev.expense ? `${number.format(Math.round(((data.expense - prev.expense) / Math.max(1, prev.expense)) * 100))}٪ بیشتر` : "کمتر یا برابر"}</h2></div><div>${monthName(addMonth(reportMonth, -1))} <b>${money(prev.expense)}</b><br>${monthName(reportMonth)} <b>${money(data.expense)}</b></div></section>` : ""}`;
+  }</article></section>${state.reportType === "month" ? `<section class="comparison-panel"><div><p class="eyebrow">مقایسه با ماه قبل</p><h2>هزینه‌ها ${data.expense > prev.expense ? `${number.format(Math.round(((data.expense - prev.expense) / Math.max(1, prev.expense)) * 100))}٪ بیشتر` : "کمتر یا برابر"}</h2></div><div>${monthName(addMonth(reportMonth, -1))} <b>${money(prev.expense)}</b><br>${monthName(reportMonth)} <b>${money(data.expense)}</b></div></section>` : ""}${activityLog}`;
 }
 function backupSection() {
   const last = state.lastBackup;
@@ -1280,13 +1387,13 @@ function settings() {
       <h2>${t("با برنامه آشنا شو")}</h2>
       <p class="muted-copy">${t("این برنامه یک دفتر مالی شخصی و کاملاً آفلاین است؛ همهٔ اطلاعات فقط روی همین دستگاه ذخیره می‌شود و هیچ داده‌ای به اینترنت یا فضای ابری ارسال نمی‌شود.")}</p>
       <ol class="guide-steps">
-        <li><b>${t("۱. ثبت حقوق و بودجه")}</b><span>${t("در صفحهٔ اصلی می‌توانی")} <b>${t("حقوق تخمینی")}</b> ${t("ماه را ثبت کنی (ویرایش یا ثبت از تنظیمات ← درآمد و بودجه). این مبلغ تا زمان ثبت حقوق واقعی در موجودی لحاظ می‌شود؛ بعد از ثبت حقوق واقعی، اختلاف آن خودکار در موجودی اعمال می‌شود و برای هر ماه فقط یک رکورد حقوق ثبت می‌شود. سقف بودجهٔ هزینه و هدف پس‌انداز را هم همان‌جا تعیین کن؛ اگر هزینه‌ها به سقف بودجه برسد، هشدار می‌گیری.")}</span></li>
+        <li><b>${t("۱. ثبت حقوق و بودجه")}</b><span>${t("در صفحهٔ اصلی، حقوق تخمینی ماه را برای برنامه‌ریزی ثبت کن. وقتی حقوق واقعاً به حسابت واریز شد، دکمهٔ ثبت حقوق واقعی را بزن. حقوق واقعی جای تخمین همان ماه را می‌گیرد و هر ماه فقط یک رکورد حقوق ثبت می‌شود. با شروع ماه شمسی جدید، ماندهٔ ماه قبل در موجودی می‌ماند و حقوق جدید به آن اضافه می‌شود.")} ${t("سقف بودجهٔ هزینه و هدف پس‌انداز را هم از تنظیمات تعیین کن؛ اگر هزینه‌ها به سقف بودجه برسد، هشدار می‌گیری.")}</span></li>
         <li><b>${t("۲. ثبت درآمد و هزینه")}</b><span>${t("از صفحهٔ")} <b>${t("هزینه‌ها")}</b> ${t("هزینه یا درآمد دیگر ثبت کن (عنوان، مبلغ، دسته، تاریخ شمسی و توضیحات). تاریخ نمی‌تواند آینده باشد و جست‌وجو و فیلتر دسته دارد. اگر موجودی ماه کافی نباشد، برنامه پیشنهاد می‌دهد کسری از")} <b>${t("پس‌انداز")}</b> ${t("برداشت شود؛ اگر نپذیری یا پس‌اندازی نباشد، تراکنش ثبت نمی‌شود. هر تراکنش را می‌توانی حذف کنی.")}</span></li>
-        <li><b>${t("۳. مدیریت اقساط")}</b><span>${t("در صفحهٔ")} <b>${t("اقساط")}</b> ${t("قسط را با نام، مبلغ ماهانه، مبلغ کل بدهی، تعداد کل ماه‌ها، تعداد اقساط پرداخت‌شده و سررسید بعدی ثبت کن (مثلاً اگر ۸ از ۱۲ قسط را داده‌ای، ۸ را وارد کن؛ برنامه از قسط نهم ادامه می‌دهد). فقط در ماه سررسید، دکمهٔ")} <b>${t("پرداخت شد")}</b> ${t("ظاهر می‌شود؛ با زدن آن، مبلغ از موجودی کسر و یک قسط تسویه می‌شود و اگر موجودی کافی نباشد، برداشت از پس‌انداز پیشنهاد می‌شود. اقساط عقب‌افتاده در محاسبهٔ بدهی باقی می‌مانند. بدهی باقی‌ماندهٔ کل بالای صفحه نمایش داده می‌شود.")}</span></li>
-        <li><b>${t("۴. ثبت چک‌ها")}</b><span>${t("در صفحهٔ")} <b>${t("چک‌ها")}</b> ${t("چک‌ها را با عنوان، مبلغ و تاریخ سررسید ثبت کن. مبلغ چک صرفاً جهت اطلاع است و در موجودی و گزارش‌های مالی محاسبه نمی‌شود؛ اما ۷ و ۲ روز قبل از سررسید اعلان یادآوری می‌گیری و وضعیت هر چک (روز مانده، سررسید امروز یا گذشته) نشان داده می‌شود.")}</span></li>
-        <li><b>${t("۵. مشاهدهٔ گزارش‌ها")}</b><span>${t("در صفحهٔ")} <b>${t("گزارش")}</b> ${t("حالت ماهانه یا سالانه را انتخاب و با فلش‌ها بین ماه‌ها/سال‌ها حرکت کن. درآمد کل، حقوق دریافتی، سایر درآمدها، هزینه، اقساط پرداختی، مبلغ باقی‌مانده، بدهی باقی‌مانده و میانگین و بیشترین دسته را با نمودار دایره‌ای، جدول جریان پول ۳ ماه/۱۲ ماه، تفکیک دسته‌بندی و مقایسه با ماه قبل ببین. با دکمهٔ PDF هم می‌توانی از گزارش خروجی بگیری (چ/ذخیره).")}</span></li>
-        <li><b>${t("۶. پس‌انداز")}</b><span>${t("مازاد هر ماه به‌صورت خودکار به پس‌انداز منتقل نمی‌شود. در کارت")} <b>${t("پس‌انداز")}</b> ${t("صفحهٔ اصلی، اگر ماه جاری مازاد داشته باشی، دکمهٔ")} <b>${t("انتقال مازاد")}</b> ${t("ظاهر می‌شود و با زدن آن مبلغ باقی‌مانده به پس‌انداز منتقل و از موجودی ماه کسر می‌شود (هر ماه فقط یک بار). برعکس، اگر هنگام هزینه یا قسط موجودی کافی نباشد، برنامه با تأیید تو از پس‌انداز برداشت می‌کند. مجموع پس‌انداز همیشه در همان کارت نمایش داده می‌شود.")}</span></li>
-        <li><b>${t("۷. یادآوری‌ها")}</b><span>${t("از بخش یادآوری‌ها در تنظیمات:")} <b>${t("اعلان روز سررسید قسط")}</b> ${t("(ساعت ۹ صبح روز سررسید) و")} <b>${t("یادآوری ثبت هزینه")}</b> ${t("(هر روز ساعت ۹ صبح و ۹ شب) را روشن یا خاموش کن. برای یادآوری چک‌ها هم فقط کافی است چک را ثبت کنی. همهٔ اعلان‌ها محلی هستند و به اینترنت نیاز ندارند؛ فقط باید مجوز اعلان را داده باشی.")}</span></li>
+        <li><b>${t("۳. مدیریت اقساط")}</b><span>${t("در صفحهٔ")} <b>${t("اقساط")}</b> ${t("قسط را با نام، مبلغ ماهانه، مبلغ کل بدهی، تعداد کل ماه‌ها، تعداد اقساط پرداخت‌شده و سررسید بعدی ثبت کن (مثلاً اگر ۸ از ۱۲ قسط را داده‌ای، ۸ را وارد کن؛ برنامه از قسط نهم ادامه می‌دهد). در ماه سررسید، قسط را ثبت کن؛ اگر بخواهی می‌توانی آن را زودتر هم پرداخت کنی.")} ${t("با ثبت پرداخت، مبلغ از موجودی کسر می‌شود و یک قسط تسویه می‌شود. اگر موجودی کافی نباشد، برداشت از پس‌انداز پیشنهاد می‌شود. اقساط عقب‌افتاده در محاسبهٔ بدهی باقی می‌مانند و بدهی کل بالای صفحه دیده می‌شود.")}</span></li>
+        <li><b>${t("۴. ثبت چک‌ها")}</b><span>${t("در صفحهٔ")} <b>${t("چک‌ها")}</b> ${t("چک‌ها را با عنوان، مبلغ و تاریخ سررسید ثبت کن. مبلغ چک فقط برای یادآوری است و در موجودی یا گزارش‌های مالی حساب نمی‌شود. با ثبت چک، اعلان ۷ روز قبل، ۲ روز قبل و روز سررسید برایت زمان‌بندی می‌شود.")} ${t("وضعیت هر چک، مثل روزهای باقی‌مانده یا سررسید امروز، در فهرست چک‌ها دیده می‌شود.")}</span></li>
+        <li><b>${t("۵. مشاهدهٔ گزارش‌ها")}</b><span>${t("در صفحهٔ")} <b>${t("گزارش")}</b> ${t("گزارش ماهانه یا سالانه را انتخاب کن. در گزارش ماهانه، ماندهٔ منتقل‌شده از ماه‌های قبل جداگانه دیده می‌شود؛ مبلغ باقی‌مانده، موجودی پایان دوره را نشان می‌دهد.")} ${t("درآمد، حقوق، هزینه، اقساط پرداخت‌شده و دسته‌بندی هزینه‌ها را هم بررسی کن و در صورت نیاز گزارش را PDF بگیر.")}</span></li>
+        <li><b>${t("۶. پس‌انداز")}</b><span>${t("از کارت پس‌انداز صفحهٔ اصلی، هر بار مبلغ دلخواهی از موجودی در دسترس را به پس‌انداز منتقل کن. در طول ماه می‌توانی چند بار انتقال انجام بدهی؛ هر مبلغ منتقل‌شده از موجودی کم و به پس‌انداز اضافه می‌شود. مبلغ هر انتقال نمی‌تواند از موجودی قابل‌انتقال بیشتر باشد.")} ${t("اگر هنگام ثبت هزینه یا پرداخت قسط موجودی کافی نباشد، برنامه با تأیید تو برداشت از پس‌انداز را پیشنهاد می‌کند.")}</span></li>
+        <li><b>${t("۷. یادآوری‌ها")}</b><span>${t("اعلان قسط در ساعت ۹ صبح روز سررسید می‌آید. برای چک‌ها، اعلان ۷ روز قبل، ۲ روز قبل و روز سررسید زمان‌بندی می‌شود. یادآوری ثبت هزینه هم روزی سه بار، ساعت ۹ صبح، ۳ بعدازظهر و ۹ شب می‌آید.")} ${t("یادآوری قسط و ثبت هزینه را از تنظیمات روشن یا خاموش کن. برای دریافت اعلان‌ها، مجوز اعلان برنامه باید فعال باشد.")}</span></li>
         <li><b>${t("۸. امنیت")}</b><span>${t("در اولین اجرا PIN چهار یا شش رقمی می‌سازی. از")} <b>${t("تنظیمات ← امنیت دستگاه")}</b> ${t("قفل خودکار (۱ تا ۳۰ دقیقه)، ورود بیومتریک (اثر انگشت) و تغییر PIN را مدیریت کن. PIN با هش SHA-256 ذخیره می‌شود و با بازنشانی اطلاعات حفظ می‌شود.")}</span></li>
         <li><b>${t("۹. پشتیبان‌گیری")}</b><span>${t("از")} <b>${t("تنظیمات ← پشتیبان‌گیری")}</b> ${t("فایل پشتیبان کامل بگیر (در پوشهٔ Documents یا Downloads گوشی ذخیره می‌شود) و بعداً بازگردانی کن. پشتیبان سریع داخلی، پشتیبان خودکار بعد از هر ثبت اطلاعات (فقط داخل برنامه) و انتخاب محل ذخیره هم در دسترس است. قبل از تعویض گوشی یا پاک‌کردن اطلاعات حتماً پشتیبان بگیر.")}</span></li>
         <li><b>${t("۱۰. شخصی‌سازی")}</b><span>${t("از")} <b>${t("تنظیمات ← ظاهر و اندازهٔ نوشته")}</b> ${t("پوستهٔ روشن/تاریک، زبان (فارسی/English) و اندازهٔ فونت (کوچک تا خیلی بزرگ) را تنظیم کن. دسته‌بندی هزینه‌ها را هم از بخش")} <b>${t("دسته‌بندی‌ها")}</b> ${t("اضافه یا حذف کن (دسته‌ای که تراکنش دارد حذف نمی‌شود).")}</span></li>
@@ -1297,50 +1404,35 @@ function settings() {
           <li>${t("تاریخ‌ها به شمسی وارد می‌شوند؛ مثل ۱۴۰۵/۱۰/۲.")}</li>
           <li>${t("مبالغ همیشه به تومان است.")}</li>
           <li>${t("مبلغ چک‌ها در محاسبات مالی محاسبه نمی‌شود و صرفاً برای یادآوری است.")}</li>
-          <li>${t("موجودی صفحهٔ اصلی یعنی: درآمد + حقوق + برداشت از پس‌انداز منهای هزینه، اقساط پرداختی و مبلغ منتقل‌شده به پس‌انداز.")}</li>
-          <li>${t("با تغییر ماه شمسی، خودکار ماه جدید آغاز می‌شود و صفحهٔ ثبت حقوق تخمینی پیشنهاد می‌شود.")}</li>
-          <li>${t("برای یادآوری اقساط، چک‌ها و ثبت هزینه، مجوز اعلان را به برنامه بده.")}</li>
+          <li>${t("موجودی صفحهٔ اصلی، ماندهٔ ماه‌های قبل را به‌علاوهٔ درآمد و حقوق می‌گیرد و هزینه، اقساط پرداخت‌شده و انتقال به پس‌انداز را از آن کم می‌کند.")}</li>
+          <li>${t("با شروع ماه شمسی جدید، ماندهٔ ماه قبل حفظ می‌شود؛ حقوق ماه جدید را جداگانه ثبت کن تا به موجودی اضافه شود.")}</li>
+          <li>${t("برای اعلان اقساط، چک‌ها و یادآوری روزانهٔ ثبت هزینه، مجوز اعلان برنامه را فعال کن.")}</li>
         </ul>
       </div>
     </section>`;
   }
   if (pane === "contact") {
-    return `${heading("ارتباط با ما")}<section class="settings-section contact-card luxury-contact">
-      <div class="contact-hero luxury-hero">
-        <div class="contact-avatar-wrap">
-          <img class="contact-avatar" src="/omid-marddel.jpg" alt="امید مرددل" />
+    return `${heading("ارتباط با ما")}<section class="settings-section contact-card support-contact">
+      <header class="support-intro">
+        <div class="support-identity">
+          <img class="contact-avatar" src="/omid-marddel.jpg" alt="امید مرددل، سازندهٔ برنامه" />
+          <div>
+            <p class="support-eyebrow">پشتیبانی</p>
+            <h2>امید مرددل</h2>
+          </div>
         </div>
-        <div class="contact-hero-text">
-          <p class="eyebrow">سلام! 👋</p>
-          <h2>امید مرددل</h2>
-          <p class="contact-role">سازندهٔ برنامه</p>
-        </div>
-      </div>
-      <p class="contact-intro">برای پیشنهاد، انتقاد یا گزارش مشکل، از راه‌های زیر با من در تماس باش.</p>
-      <div class="contact-links luxury-links">
-        <a class="contact-link luxury-link contact-phone" href="sms:+989197392944">
-          <span class="contact-link-icon luxury-icon">📞</span>
-          <span class="luxury-link-text">
-            <b>پیامک</b>
-            <span class="contact-phone-number" dir="ltr">09197392944</span>
-          </span>
-          <span class="luxury-arrow">›</span>
+        <p class="support-lead">پرسش یا پیشنهادی داری؟ پیام بده.</p>
+      </header>
+      <div class="support-divider"><span>راه‌های ارتباط</span></div>
+      <div class="support-channels">
+        <a class="support-channel support-channel-icon-only support-channel-phone" href="tel:+989197392944" aria-label="تماس تلفنی با امید مرددل" title="تلفن">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"/></svg>
         </a>
-        <button class="contact-link luxury-link" data-action="open-link" data-url="https://t.me/+989197392944">
-          <span class="contact-link-icon luxury-icon">✈️</span>
-          <span class="luxury-link-text">
-            <b>تلگرام</b>
-            <small>پیام و پیشنهاد</small>
-          </span>
-          <span class="luxury-arrow">›</span>
+        <button class="support-channel support-channel-icon-only support-channel-telegram" type="button" data-action="open-link" data-url="https://t.me/+989197392944" aria-label="ارتباط از طریق تلگرام" title="تلگرام">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.94 4.66 18.8 19.47c-.24 1.05-.86 1.31-1.75.82l-4.84-3.57-2.34 2.25c-.26.26-.48.48-.98.48l.35-4.93 8.97-8.1c.39-.35-.08-.55-.6-.2L6.52 13.38l-4.78-1.49c-1.04-.32-1.06-1.04.22-1.55L20.65 3.1c.86-.32 1.62.21 1.29 1.56z"/></svg>
         </button>
-        <button class="contact-link luxury-link" data-action="open-link" data-url="https://wa.me/989197392944">
-          <span class="contact-link-icon luxury-icon">💬</span>
-          <span class="luxury-link-text">
-            <b>واتساپ</b>
-            <small>ارتباط مستقیم</small>
-          </span>
-          <span class="luxury-arrow">›</span>
+        <button class="support-channel support-channel-icon-only support-channel-whatsapp" type="button" data-action="open-link" data-url="https://wa.me/989197392944" aria-label="ارتباط از طریق واتساپ" title="واتساپ">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.86 11.86 0 0 0 12.08 0C5.52 0 .18 5.34.18 11.9c0 2.1.55 4.15 1.6 5.96L.08 24l6.29-1.65a11.9 11.9 0 0 0 5.7 1.45h.01c6.56 0 11.9-5.34 11.9-11.9 0-3.18-1.24-6.17-3.46-8.42zM12.08 21.8a9.88 9.88 0 0 1-5.04-1.38l-.36-.21-3.73.98 1-3.64-.24-.37a9.85 9.85 0 0 1-1.51-5.28c0-5.46 4.44-9.9 9.9-9.9a9.83 9.83 0 0 1 7 2.9 9.83 9.83 0 0 1 2.9 7c0 5.46-4.44 9.9-9.92 9.9zm5.43-7.41c-.3-.15-1.77-.87-2.05-.97-.28-.1-.48-.15-.68.15-.2.3-.78.97-.96 1.17-.18.2-.35.22-.65.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.77-1.64-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.63-.94-2.23-.25-.58-.5-.5-.68-.51h-.58c-.2 0-.53.07-.8.37-.28.3-1.06 1.04-1.06 2.52s1.08 2.92 1.23 3.12c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.18-1.43-.08-.13-.28-.2-.58-.35z"/></svg>
         </button>
       </div>
     </section>`;
@@ -1382,18 +1474,21 @@ async function resetAppData() {
     "checks",
     "categories",
     "budgets",
+    "category_budgets",
     "savings_transfers",
     "savings_movements",
+    "activities",
   ])
     await clearStore(table);
   await clearStore("settings");
   for (const row of savedPin) await save("settings", row);
   for (const name of defaultCategories)
     await save("categories", { id: id(), name });
+  await recordActivity("اطلاعات برنامه بازنشانی شد");
   Object.assign(state, {
     report: monthNow(),
     reportType: "month",
-    search: "",
+    lastBackup: null,
     filter: "all",
   });
   await refresh();
@@ -1422,7 +1517,7 @@ function render() {
       `${savingsSummary()}<section class="home-lower">`,
     );
   }
-  root.innerHTML = `<div class="app-shell"><header class="topbar"><a class="brand-link" data-page="home"><b>مدیریت مالی حقوق</b></a></header><main class="content-area">${body}</main><nav class="bottom-nav">${tabs.map(([key, label, glyph]) => `<button class="nav-item ${state.page === key ? "active" : ""}" data-page="${key}"><span>${glyph}</span>${label}</button>`).join("")}</nav><div id="modalRoot"></div><div id="toast" role="status"></div></div>`;
+  root.innerHTML = `<div class="app-shell"><header class="topbar"><a class="brand-link" data-page="home"><b>مدیریت مالی حقوق</b></a></header><main class="content-area">${body}</main><nav class="bottom-nav">${tabs.map(([key, label, glyph]) => `<button class="nav-item ${state.page === key ? "active" : ""}" data-page="${key}"><span>${glyph}</span><span class="nav-label">${t(label)}</span></button>`).join("")}</nav><div id="modalRoot"></div><div id="toast" role="status"></div></div>`;
   const settingsSide = document.querySelector(".settings-side");
   if (settingsSide) {
     settingsSide.insertAdjacentHTML("afterbegin", themePanel());
@@ -1518,6 +1613,13 @@ function monthEntryForm() {
     `<p class="muted-copy">این مبلغ تا زمان ثبت حقوق واقعی در موجودی حساب می‌شود. بعد از ثبت حقوق واقعی، اختلاف آن به‌صورت خودکار در موجودی اعمال می‌شود.</p><form data-form="month-entry">${amountInput("حقوق تخمینی این ماه (تومان)", "salaryEstimate", String(salaryEstimateFor(monthNow()) || +setting("monthlySalary", 0) || ""))}<button class="primary-button">ذخیرهٔ حقوق تخمینی</button></form>`,
   );
 }
+function savingsTransferForm() {
+  const available = Math.max(0, monthData(monthNow()).remaining);
+  modal(
+    "انتقال به پس‌انداز",
+    `<p class="muted-copy">موجودی قابل انتقال این ماه: <b>${money(available)}</b> تومان</p><form data-form="savings-transfer">${amountInput("مبلغ دلخواه (تومان)", "amount", "") }<button class="primary-button">انتقال به پس‌انداز</button></form>`,
+  );
+}
 function download(name, data, type) {
   const link = document.createElement("a");
   link.href = URL.createObjectURL(new Blob([data], { type }));
@@ -1538,8 +1640,10 @@ async function backup() {
     "categories",
     "settings",
     "budgets",
+    "category_budgets",
     "savings_transfers",
     "savings_movements",
+    "activities",
   ])
     payload[table] = await all(table);
   const contents = JSON.stringify(payload, null, 2);
@@ -1581,17 +1685,21 @@ async function backup() {
     } catch (error) {
       /* user closed the share sheet */
     }
-    state.lastBackup = { name, uri: savedPath, at: new Date().toISOString() };
-    if (setting("backupAutoSave", true))
-      await setSetting("lastBackup", state.lastBackup);
+    await persistBackupMetadata({
+      name,
+      uri: savedPath,
+      at: new Date().toISOString(),
+    });
     render();
     toast("فایل پشتیبان ذخیره شد.");
     return;
   }
   download(name, contents, "application/json");
-  state.lastBackup = { name, uri: "", at: new Date().toISOString() };
-  if (setting("backupAutoSave", true))
-    await setSetting("lastBackup", state.lastBackup);
+  await persistBackupMetadata({
+    name,
+    uri: "",
+    at: new Date().toISOString(),
+  });
   render();
   toast("نسخهٔ پشتیبان آماده شد.");
 }
@@ -1613,12 +1721,16 @@ async function restoreText(text) {
   const tables = [
     ...requiredTables,
     "checks",
+    "category_budgets",
     "savings_transfers",
     "savings_movements",
+    "activities",
   ];
   if (!Array.isArray(payload.checks)) payload.checks = [];
+  if (!Array.isArray(payload.category_budgets)) payload.category_budgets = [];
   if (!Array.isArray(payload.savings_transfers)) payload.savings_transfers = [];
   if (!Array.isArray(payload.savings_movements)) payload.savings_movements = [];
+  if (!Array.isArray(payload.activities)) payload.activities = [];
   if (
     !confirm(t("اطلاعات فعلی با نسخهٔ پشتیبان جایگزین می‌شود. ادامه می‌دهی؟"))
   )
@@ -1627,6 +1739,7 @@ async function restoreText(text) {
     await clearStore(table);
     for (const row of payload[table]) await save(table, row);
   }
+  await recordActivity("اطلاعات از نسخهٔ پشتیبان بازیابی شد");
   await applyRestoredData();
 }
 async function restorePick() {
@@ -1724,8 +1837,10 @@ async function autoBackup() {
     "categories",
     "settings",
     "budgets",
+    "category_budgets",
     "savings_transfers",
     "savings_movements",
+    "activities",
   ])
     payload[table] = await all(table);
   const contents = JSON.stringify(payload);
@@ -1748,8 +1863,7 @@ async function autoBackup() {
       );
       record = { name, uri: "local", at: new Date().toISOString() };
     }
-    state.lastBackup = record;
-    if (setting("backupAutoSave", true)) await setSetting("lastBackup", record);
+    await persistBackupMetadata(record);
   } catch (error) {
     console.warn("Auto backup failed", error);
   }
@@ -1807,6 +1921,7 @@ async function handleForm(form) {
       const salt = id();
       await setSetting("pinSalt", salt);
       await setSetting("pinHash", await digest(pin, salt));
+      await recordActivity("رمز ورود برنامه تنظیم شد");
     } else if ((await digest(pin, setting("pinSalt"))) !== setting("pinHash")) {
       error.textContent = "PIN واردشده درست نیست.";
       return;
@@ -1857,6 +1972,10 @@ async function handleForm(form) {
       });
       for (const duplicate of salaryRows.slice(1))
         await remove("transactions", duplicate.id);
+      await recordActivity(
+        salaryRows.length ? "حقوق ماهانه ویرایش شد" : "حقوق ماهانه ثبت شد",
+        +value.amount,
+      );
     } else {
       const transaction = {
         id: id(),
@@ -1883,6 +2002,13 @@ async function handleForm(form) {
           throw error;
         }
       }
+      const actionName = transaction.kind === "expense" ? "هزینه ثبت شد" : "درآمد ثبت شد";
+      const categoryName = transaction.category ? " · " + displayCategory(transaction.category) : "";
+      const savingsNote = savingsWithdrawal > 0 ? " · با برداشت از پس‌انداز" : "";
+      await recordActivity(
+        actionName + ": " + transaction.title + categoryName + savingsNote,
+        transaction.amount,
+      );
     }
     await refresh();
     render();
@@ -1909,6 +2035,10 @@ async function handleForm(form) {
       created_at: previous?.created_at || dateNow(),
     };
     await save("checks", check);
+    await recordActivity(
+      (previous ? "چک ویرایش شد: " : "چک ثبت شد: ") + check.title,
+      check.amount,
+    );
     await refresh();
     let message = "چک ثبت شد؛ مبلغ آن در محاسبات مالی وارد نمی‌شود.";
     if (Capacitor.isNativePlatform()) {
@@ -1998,6 +2128,10 @@ async function handleForm(form) {
       loan_amount: loanAmount,
       interest_rate: interestRate,
     });
+    await recordActivity(
+      (isEdit ? "قسط ویرایش شد: " : "قسط ثبت شد: ") + value.name.trim(),
+      monthly,
+    );
     await refresh();
     let savedMessage = isEdit ? "قسط بروزرسانی شد." : "قسط ثبت شد.";
     if (Capacitor.isNativePlatform() && setting("installmentReminders", true)) {
@@ -2034,6 +2168,11 @@ async function handleForm(form) {
       month: current,
       amount,
     });
+    const category = state.categories.find((item) => item.id === categoryId);
+    await recordActivity(
+      "بودجهٔ " + (category ? displayCategory(category.name) : "دسته") + (existing ? " ویرایش شد" : " ثبت شد"),
+      amount,
+    );
     await refresh();
     state.page = "expenses";
     render();
@@ -2044,16 +2183,22 @@ async function handleForm(form) {
     await setSetting("monthlySalary", +value.salaryEstimate || 0);
     await setSetting(`salaryEstimate:${period}`, +value.salaryEstimate || 0);
     await setSetting(`salary-estimate:${period}`, true);
+    await recordActivity("حقوق تخمینی ماه ثبت شد", +value.salaryEstimate || 0);
     state.pendingMonthEntry = false;
     state.monthPromptShown = false;
     render();
     toast("حقوق تخمینی ماه ذخیره شد و در موجودی لحاظ شد.");
+  }
+  if (form.dataset.form === "savings-transfer") {
+    await transferToSavings(+value.amount);
+    return;
   }
   if (form.dataset.form === "settings") {
     await setSetting("monthlySalary", +value.salary || 0);
     await setSetting("monthlyBudget", +value.budget || 0);
     await setSetting("savingsGoal", +value.savings || 0);
     await save("budgets", { month: monthNow(), amount: +value.budget || 0 });
+    await recordActivity("بودجه و هدف پس‌انداز ماهانه تنظیم شد", +value.budget || 0);
     await refresh();
     render();
     toast("تنظیمات ذخیره شد.");
@@ -2063,6 +2208,7 @@ async function handleForm(form) {
     if (!name || state.categories.some((row) => row.name === name))
       return toast("نام دسته خالی یا تکراری است.", true);
     await save("categories", { id: id(), name });
+    await recordActivity("دستهٔ هزینه اضافه شد: " + name);
     await refresh();
     render();
     toast("دسته اضافه شد.");
@@ -2077,6 +2223,7 @@ async function handleForm(form) {
     const salt = id();
     await setSetting("pinSalt", salt);
     await setSetting("pinHash", await digest(value.next, salt));
+    await recordActivity("رمز ورود برنامه تغییر کرد");
     render();
     toast("PIN تغییر کرد.");
   }
@@ -2303,6 +2450,7 @@ root.addEventListener("click", async (event) => {
   const fontChoice = event.target.closest("[data-font-choice]");
   if (fontChoice) {
     await setSetting("fontSize", fontChoice.dataset.fontChoice);
+    await recordActivity("اندازهٔ نوشتهٔ برنامه تغییر کرد");
     applyFontSize();
     render();
     return;
@@ -2313,6 +2461,7 @@ root.addEventListener("click", async (event) => {
     if (getLanguage() !== language) {
       await setSetting("language", language);
       setLanguage(language);
+      await recordActivity(language === "en" ? "زبان برنامه به انگلیسی تغییر کرد" : "زبان برنامه به فارسی تغییر کرد");
       if (Capacitor.isNativePlatform()) {
         try {
           await Promise.all([
@@ -2337,6 +2486,7 @@ root.addEventListener("click", async (event) => {
   if (themeChoice) {
     const theme = themeChoice.dataset.themeChoice;
     await setSetting("theme", theme);
+    await recordActivity(theme === "dark" ? "پوستهٔ تیره فعال شد" : "پوستهٔ روشن فعال شد");
     document.documentElement.dataset.theme = theme;
     await applyStatusBarTheme(theme);
     render();
@@ -2396,14 +2546,24 @@ root.addEventListener("click", async (event) => {
       case "add-category-budget":
         categoryBudgetForm({ category_id: key });
         break;
+      case "category-budget-details":
+        categoryBudgetReport(key);
+        break;
       case "edit-category-budget": {
-        const budget = state.categoryBudgets.find((row) => row.id === key);
-        if (budget) categoryBudgetForm(budget);
+        // The row button carries the category id; the saved budget has its own id.
+        const budget = state.categoryBudgets.find(
+          (row) =>
+            row.category_id === key &&
+            (row.month === monthNow() || legacyPeriodToJalali(row.month) === monthNow()),
+        );
+        categoryBudgetForm(budget || { category_id: key });
         break;
       }
       case "delete-check": {
         if (confirm(t("این چک حذف شود؟"))) {
+          const item = state.checks.find((row) => row.id === key);
           await remove("checks", key);
+          if (item) await recordActivity("چک حذف شد: " + item.title, item.amount);
           await refresh();
           if (Capacitor.isNativePlatform()) {
             try {
@@ -2422,7 +2582,9 @@ root.addEventListener("click", async (event) => {
         break;
       case "delete-installment": {
         if (confirm(t("این قسط حذف شود؟"))) {
+          const item = state.installments.find((row) => row.id === key);
           await remove("installments", key);
+          if (item) await recordActivity("قسط حذف شد: " + item.name, item.monthly_amount);
           await refresh();
           if (Capacitor.isNativePlatform()) {
             try {
@@ -2489,6 +2651,10 @@ root.addEventListener("click", async (event) => {
             );
           }
           await save("installments", item);
+          await recordActivity(
+            "قسط پرداخت شد: " + item.name + (savingsWithdrawal > 0 ? " · با برداشت از پس‌انداز" : ""),
+            amount,
+          );
           await refresh();
           try {
             await scheduleInstallmentNotifications();
@@ -2502,11 +2668,17 @@ root.addEventListener("click", async (event) => {
       }
       case "delete":
         if (confirm(t("این تراکنش حذف شود؟"))) {
+          const item = state.transactions.find((row) => row.id === key);
           for (const movement of state.savingsMovements.filter(
             (row) => row.transaction_id === key,
           ))
             await remove("savings_movements", movement.id);
           await remove("transactions", key);
+          if (item)
+            await recordActivity(
+              (item.kind === "expense" ? "هزینه حذف شد: " : "درآمد حذف شد: ") + item.title,
+              item.amount,
+            );
           await refresh();
           render();
         }
@@ -2526,6 +2698,7 @@ root.addEventListener("click", async (event) => {
           return toast("دسته‌ای که تراکنش دارد حذف نمی‌شود.", true);
         if (item && confirm(t("این دسته حذف شود؟"))) {
           await remove("categories", key);
+          await recordActivity("دستهٔ هزینه حذف شد: " + item.name);
           await refresh();
           render();
         }
@@ -2586,7 +2759,19 @@ root.addEventListener("click", async (event) => {
         }
         break;
       case "savings-transfer":
-        await transferRemainingToSavings();
+        savingsTransferForm();
+        break;
+      case "clear-activities":
+        if (
+          state.activities.length &&
+          confirm(t("گزارش فعالیت‌ها پاک شود؟ اطلاعات مالی برنامه حذف نمی‌شود."))
+        ) {
+          await clearStore("activities");
+          state.activities = [];
+          scheduleAutoBackup();
+          render();
+          toast("گزارش فعالیت‌ها پاک شد.");
+        }
         break;
       case "pdf":
         window.print();
@@ -2611,16 +2796,6 @@ root.addEventListener("click", async (event) => {
     toast(error.message || "عملیات انجام نشد.", true);
   }
 });
-root.addEventListener("input", (event) => {
-  if (event.target.id === "search") {
-    state.search = event.target.value;
-    const cursor = event.target.selectionStart;
-    render();
-    const input = document.querySelector("#search");
-    input?.focus();
-    input?.setSelectionRange(cursor, cursor);
-  }
-});
 root.addEventListener("change", async (event) => {
   if (event.target.id === "categoryFilter") {
     state.filter = event.target.value;
@@ -2628,23 +2803,32 @@ root.addEventListener("change", async (event) => {
   }
   if (event.target.id === "autoLock") {
     await setSetting("autoLockMinutes", +event.target.value);
+    await recordActivity("مدت قفل خودکار تغییر کرد");
     startTimer();
   }
-  if (event.target.id === "bioToggle")
+  if (event.target.id === "bioToggle") {
     await setSetting("biometricEnabled", event.target.checked);
-  if (event.target.id === "backupDir")
+    await recordActivity(event.target.checked ? "ورود بیومتریک فعال شد" : "ورود بیومتریک غیرفعال شد");
+  }
+  if (event.target.id === "backupDir") {
     await setSetting("backupDir", event.target.value);
-  if (event.target.id === "backupAutoSave")
+    await recordActivity("محل ذخیرهٔ نسخهٔ پشتیبان تغییر کرد");
+  }
+  if (event.target.id === "backupAutoSave") {
     await setSetting("backupAutoSave", event.target.checked);
+    await recordActivity(event.target.checked ? "نگه‌داری نسخهٔ پشتیبان داخل برنامه فعال شد" : "نگه‌داری نسخهٔ پشتیبان داخل برنامه غیرفعال شد");
+  }
   if (event.target.id === "installmentReminderToggle") {
     try {
       if (!event.target.checked) {
         await setSetting("installmentReminders", false);
         await cancelInstallmentNotifications();
+        await recordActivity("یادآوری سررسید قسط غیرفعال شد");
         toast("یادآوری قسط خاموش شد.");
       } else if (await requestInstallmentNotificationPermission()) {
         await setSetting("installmentReminders", true);
         await scheduleInstallmentNotifications();
+        await recordActivity("یادآوری سررسید قسط فعال شد");
         toast("یادآوری سررسید قسط فعال شد.");
       } else {
         event.target.checked = false;
@@ -2663,10 +2847,12 @@ root.addEventListener("change", async (event) => {
       if (!event.target.checked) {
         await setSetting("expenseLogReminders", false);
         await cancelExpenseLogReminders();
+        await recordActivity("یادآوری ثبت هزینه غیرفعال شد");
         toast("یادآوری ثبت هزینه خاموش شد.");
       } else if (await requestInstallmentNotificationPermission()) {
         await setSetting("expenseLogReminders", true);
         await scheduleExpenseLogReminders();
+        await recordActivity("یادآوری ثبت هزینه فعال شد");
         toast("یادآوری ثبت هزینه فعال شد.");
       } else {
         event.target.checked = false;

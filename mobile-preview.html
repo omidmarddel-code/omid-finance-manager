@@ -1,40 +1,34 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Mobile Preview</title>
-    <style>
-      body {
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background: #111;
-      }
-
-      .frame {
-        width: min(390px, 88vw);
-        aspect-ratio: 390 / 780;
-        height: auto;
-        max-height: 88vh;
-        border: 10px solid #222;
-        border-radius: 32px;
-        overflow: hidden;
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
-      }
-
-      iframe {
-        width: 100%;
-        height: 100%;
-        border: 0;
-        display: block;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="frame">
-      <iframe src="/"></iframe>
-    </div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>پیش‌نمایش موبایل همراه مالی</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Tahoma,Arial,sans-serif}
+    body{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 38%,#273c53,#111a26 72%);color:#f4f7fb}
+    .stage{display:grid;justify-items:center;gap:16px}.caption{font-size:14px;font-weight:600;letter-spacing:.1px;color:#e5edf6}
+    .phone{width:min(404px,calc(100vw - 32px));height:min(850px,calc(100vh - 84px));min-height:560px;padding:9px;border:1px solid #657183;border-radius:43px;background:linear-gradient(145deg,#303b48,#080b10 46%,#252e39);box-shadow:0 35px 90px #0009,inset 0 0 0 2px #080a0e;position:relative}
+    .screen{width:100%;height:100%;overflow:hidden;border-radius:34px;background:#fff;position:relative}.screen iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+    .camera{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:82px;height:18px;border-radius:20px;background:#080b10;z-index:2;pointer-events:none}
+    @media(max-height:650px){body{padding:10px}.stage{gap:8px}.phone{height:calc(100vh - 45px);min-height:0;border-radius:30px;padding:7px}.screen{border-radius:24px}.camera{top:10px;width:64px;height:13px}.caption{font-size:12px}}
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="caption">همراه مالی · پیش‌نمایش موبایل</div>
+    <div class="phone"><span class="camera"></span><div class="screen"><iframe id="app" src="/" title="پیش‌نمایش برنامه همراه مالی"></iframe></div></div>
+  </main>
+  <script>
+    const frame = document.getElementById('app');
+    frame.addEventListener('load', () => {
+      try {
+        const doc = frame.contentDocument;
+        const settings = doc.querySelector('.nav-item[data-page="settings"]');
+        if (settings) settings.click();
+        setTimeout(() => doc.querySelector('[data-action="settings-open"][data-pane="contact"]')?.click(), 250);
+      } catch (_) {}
+    });
+  </script>
+</body>
 </html>
